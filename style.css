@@ -1,0 +1,174 @@
+/* style.css */
+
+/* Basis-Styles für den gesamten Body und HTML */
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+}
+
+/* Header-Styles */
+header {
+    background-color: #ffeb3b;
+    padding: 20px 0;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2em;
+    color: #333;
+}
+
+/* Container für das Spiel */
+.game-container {
+    position: relative;
+    width: 100%;
+    max-width: 800px; /* Feste maximale Breite für Konsistenz */
+    margin: 20px auto;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* Canvas für das Spielfeld */
+#gameCanvas {
+    width: 100%;
+    height: 600px; /* Feste Höhe für Konsistenz */
+    background-color: #e0f7fa;
+}
+
+/* Endbildschirm Styles */
+#endScreen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    display: none; /* Versteckt standardmäßig */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+#endScreen > div, #endScreen > button {
+    margin: 10px;
+}
+
+#highScoreInput, #highScoreList {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#playerName {
+    padding: 5px;
+    font-size: 16px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 5px;
+}
+
+#submitScoreButton, #restartButton, #resetHighscoresButton {
+    padding: 10px 20px;
+    margin: 5px;
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+#submitScoreButton:hover, #restartButton:hover, #resetHighscoresButton:hover {
+    background-color: #e60000;
+}
+
+/* Spielinformationen */
+.game-info {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px;
+    background-color: #ffffff;
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+}
+
+.game-info > div {
+    font-size: 18px;
+}
+
+/* Steuerungen */
+.controls {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    background-color: #ffffff;
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+}
+
+.side-buttons, .center-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.side-buttons > button, .center-controls > button {
+    padding: 10px;
+    margin: 5px;
+    background-color: #00bcd4;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: background-color 0.3s ease;
+}
+
+.side-buttons > button:hover, .center-controls > button:hover {
+    background-color: #0097a7;
+}
+
+/* Highscore-Liste */
+#highScores {
+    list-style: none;
+    padding: 0;
+}
+
+#highScores > li {
+    margin: 5px 0;
+    font-size: 16px;
+}
+
+/* Responsive Design Anpassungen */
+@media (max-width: 768px) {
+    #gameCanvas {
+        height: 400px; /* Kleinere Höhe auf kleineren Bildschirmen */
+    }
+
+    header h1 {
+        font-size: 1.5em;
+    }
+
+    .game-info > div, #highScores > li {
+        font-size: 16px;
+    }
+
+    #submitScoreButton, #restartButton, #resetHighscoresButton {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
+
+    .side-buttons > button, .center-controls > button {
+        font-size: 16px;
+        padding: 8px;
+    }
+}
