@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Ice Cold Beer 🍺</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Einbindung der CSS-Datei -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header mit dem Spielnamen und Emoji -->
+    <header>
+        <h1>Ice Cold Beer 🍺</h1>
+    </header>
+
+    <!-- Container für das Spiel -->
+    <div class="game-container">
+        <!-- Canvas für das Spielfeld -->
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- Endbildschirm, der beim Spielende angezeigt wird -->
+        <div id="endScreen">
+            <div id="endMessage"></div>
+            <!-- Highscore-Eingabe -->
+            <div id="highScoreInput" style="display: none;">
+                <label for="playerName">Name eingeben:</label>
+                <input type="text" id="playerName" maxlength="10">
+                <button id="submitScoreButton">Bestätigen</button>
+            </div>
+            <!-- Highscore-Liste -->
+            <div id="highScoreList">
+                <h2>Highscores</h2>
+                <ol id="highScores"></ol>
+            </div>
+            <!-- Neustart-Button -->
+            <button id="restartButton">Neustart 🔄</button>
+            <!-- Reset-Button für Highscores -->
+            <button id="resetHighscoresButton">Highscores zurücksetzen</button>
+        </div>
+    </div>
+
+    <!-- Spielinformationen -->
+    <div class="game-info">
+        <div id="lives">Leben: ❤️❤️❤️</div>
+        <div id="currentHole">Aktuelles Ziel: Loch 1</div>
+    </div>
+
+    <!-- Steuerungen -->
+    <div class="controls">
+        <div class="side-buttons">
+            <button id="leftUp">⬆️</button>
+            <button id="leftDown">⬇️</button>
+        </div>
+        <div class="center-controls">
+            <div id="timer">Zeit: 00:00</div>
+            <!-- Neustart-Button -->
+            <button id="gameResetButton">🔄 Neustart</button>
+        </div>
+        <div class="side-buttons">
+            <button id="rightUp">⬆️</button>
+            <button id="rightDown">⬇️</button>
+        </div>
+    </div>
+
+    <!-- Einbindung der JavaScript-Module -->
+    <script type="module" src="src/js/main.js"></script>
+</body>
+</html>
