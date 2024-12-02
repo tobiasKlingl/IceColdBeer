@@ -5,7 +5,7 @@
  * Verwalten der Benutzeroberfläche (Anzeige von Leben, Zielen und Timer).
  */
 
-import { lives, currentTarget, elapsedTime } from './gameState.js';
+import { gameState } from './gameState.js';
 
 /**
  * Funktion zur Initialisierung der Benutzeroberfläche.
@@ -33,10 +33,10 @@ export function updateDisplay() {
     livesDisplay.textContent = 'Leben: ' + hearts;
 
     // Aktuelles Ziel anzeigen
-    currentHoleDisplay.textContent = 'Aktuelles Ziel: Loch ' + currentTarget;
+    currentHoleDisplay.textContent = 'Aktuelles Ziel: Loch ' + gameState.currentTarget;
 
     // Timer aktualisieren
-    const minutes = Math.floor(elapsedTime / 60).toString().padStart(2, '0');
-    const seconds = (elapsedTime % 60).toString().padStart(2, '0');
+    const minutes = Math.floor(gameState.elapsedTime / 60).toString().padStart(2, '0');
+    const seconds = (gameState.elapsedTime % 60).toString().padStart(2, '0');
     timerDisplay.textContent = 'Zeit: ' + minutes + ':' + seconds;
 }

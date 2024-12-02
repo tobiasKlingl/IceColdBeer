@@ -5,7 +5,7 @@
  * Kümmert sich um das Zeichnen der Spielgrafiken auf dem Canvas.
  */
 
-import { canvas, ctx, ball, bar, holes, currentTarget, gameOver } from './gameState.js';
+import { gameState } from './gameState.js';
 import { applyPhysics } from './physics.js';
 import { config } from './config.js';
 
@@ -14,54 +14,54 @@ import { config } from './config.js';
  */
 export function draw() {
     // Canvas leeren
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    gameState.ctx.clearRect(0, 0, gameState.canvas.width, gameState.canvas.height);
 
     // Löcher zeichnen und nummerieren
-    holes.forEach(hole => {
-        ctx.beginPath();
-        ctx.arc(hole.actualX, hole.actualY, hole.actualRadius, 0, Math.PI * 2);
+    gameState.holes.forEach(hole => {
+        gameState.ctx.beginPath();
+        gameState.ctx.arc(hole.actualX, hole.actualY, hole.actualRadius, 0, Math.PI * 2);
 
         // Farbe basierend auf dem Typ des Lochs festlegen
         const holeTypeNum = hole.Type;
         if (holeTypeNum === 'M') {
-            ctx.fillStyle = config.missHoleColor; // Farbe für Verlustlöcher
-        } else if (holeTypeNum === currentTarget.toString()) {
-            ctx.fillStyle = config.currentTargetHoleColor; // Farbe für aktuelles Ziel
+            gameState.ctx.fillStyle = config.missHoleColor; // Farbe für Verlustlöcher
+        } else if (holeTypeNum === gameState.currentTarget.toString()) {
+            gameState.ctx.fillStyle = config.currentTargetHoleColor; // Farbe für aktuelles Ziel
         } else if (parseInt(holeTypeNum) >= 1 && parseInt(holeTypeNum) <= config.totalLevels) {
-            ctx.fillStyle = config.otherTargetHoleColor; // Farbe für andere Ziele
+            gameState.ctx.fillStyle = config.otherTargetHoleColor; // Farbe für andere Ziele
         } else {
-            ctx.fillStyle = config.otherTargetHoleColor; // Standardfarbe
+            gameState.ctx.fillStyle = config.otherTargetHoleColor; // Standardfarbe
         }
 
-        ctx.fill();
-        ctx.closePath();
+        gameState.ctx.fill();
+        gameState.ctx.closePath();
 
         // Nummer über dem Loch zeichnen, falls erforderlich
         if ((parseInt(holeTypeNum) >= 1 && parseInt(holeTypeNum) <= config.totalLevels) || config.showNumbersOnMissHoles) {
-            ctx.fillStyle = config.fontColor; // Schriftfarbe aus config.js
-            const fontSize = canvas.height * config.fontSizePercentage;
-            ctx.font = 'bold ' + fontSize + 'px ' + config.fontFamily;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(holeTypeNum, hole.actualX, hole.actualY - hole.actualRadius - fontSize / 2);
+            gameState.ctx.fillStyle = config.fontColor; // Schriftfarbe aus config.js
+            const fontSize = gameState.canvas.height * config.fontSizePercentage;
+            gameState.ctx.font = 'bold ' + fontSize + 'px ' + config.fontFamily;
+            gameState.ctx.textAlign = 'center';
+            gameState.ctx.textBaseline = 'middle';
+            gameState.ctx.fillText(holeTypeNum, hole.actualX, hole.actualY - hole.actualRadius - fontSize / 2);
         }
     });
 
     // Stange zeichnen
-    ctx.beginPath();
-    ctx.moveTo(0, bar.leftY);
-    ctx.lineTo(canvas.width, bar.rightY);
-    ctx.lineWidth = bar.height;
-    ctx.strokeStyle = bar.color;
-    ctx.stroke();
-    ctx.closePath();
+    gameState.ctx.beginPath();
+    gameState.ctx.moveTo(0, gameState.bar.leftY);
+    gameState.ctx.lineTo(gameState.canvas.width, gameState.bar.rightY);
+    gameState.ctx.lineWidth = gameState.bar.height;
+    gameState.ctx.strokeStyle = gameState.bar.color;
+    gameState.ctx.stroke();
+    gameState.ctx.closePath();
 
     // Ball zeichnen
-    ctx.beginPath();
-    ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-    ctx.fillStyle = ball.color;
-    ctx.fill();
-    ctx.closePath();
+    gameState.ctx.beginPath();
+    gameState.ctx.arc(gameState.ball.x, gameState.ball.y, gameState.ball.radius, 0, Math.PI * 2);
+    gameState.ctx.fillStyle = gameState.ball.color;
+    gameState.ctx.fill();
+    gameState.ctx.closePath();
 
     // Physik anwenden (Schwerkraft, Kollisionen etc.)
     applyPhysics();

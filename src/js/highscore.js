@@ -5,8 +5,8 @@
  * Verwalten der Highscores, einschließlich Anzeige und Zurücksetzung.
  */
 
-import { gameOver, elapsedTime, lives, currentTarget, timerInterval } from './gameState.js';
-import { resetGame } from './gameLogic.js';
+import { resetGameLogic } from './gameLogic.js';
+import { resetGame } from './gameState.js';
 import { updateDisplay } from './ui.js';
 import { config } from './config.js';
 

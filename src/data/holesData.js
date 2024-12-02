@@ -1,4 +1,4 @@
-window.holesData = [
+export const holesData = [
     { X: 0.667, Y: 0.272, Radius: 0.032065, Type: '79' },
     { X: 0.182, Y: 0.511, Radius: 0.032065, Type: '20' },
     { X: 0.29, Y: 0.39, Radius: 0.029, Type: '68' },

@@ -5,7 +5,7 @@
  * Verwalten der Benutzereingaben (Button- und Touch-Ereignisse).
  */
 
-import { startMoving, stopMoving, resetGame } from './gameLogic.js';
+import { startMoving, stopMoving, resetGameLogic } from './gameLogic.js';
 
 /**
  * Funktion zur Einrichtung der Eingabe-Handler.
