@@ -1,7 +1,7 @@
 window.onload = function() {
     // Konfiguration laden
     const script = document.createElement('script');
-    script.src = 'config.js';
+    script.src = 'src/js/config.js';
     script.onload = function() {
         initializeGame();
     };
@@ -79,7 +79,7 @@ window.onload = function() {
 
         function loadHoleData() {
             const script = document.createElement('script');
-            script.src = 'holesData.js';
+            script.src = 'src/data/holesData.js';
             script.onload = function() {
                 holes = window.holesData.map(hole => ({
                     x: hole.X,
