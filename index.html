@@ -4,57 +4,58 @@
     <meta charset="UTF-8">
     <title>Ice Cold Beer 🍺</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Einbindung der CSS-Datei -->
+    <!-- Include the CSS file -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Header mit dem Spielnamen und Emoji -->
+    <!-- Header with the game name and emoji -->
     <header>
         <h1>Ice Cold Beer 🍺</h1>
     </header>
 
-    <!-- Container für das Spiel -->
+    <!-- Game container -->
     <div class="game-container">
-        <!-- Canvas für das Spielfeld -->
+        <!-- Canvas for the game field -->
         <canvas id="gameCanvas"></canvas>
 
-        <!-- Endbildschirm, der beim Spielende angezeigt wird -->
+        <!-- End screen displayed when the game ends -->
         <div id="endScreen">
             <div id="endMessage"></div>
-            <!-- Highscore-Eingabe -->
+            <!-- Highscore input -->
             <div id="highScoreInput" style="display: none;">
                 <label for="playerName">Name eingeben:</label>
                 <input type="text" id="playerName" maxlength="10">
                 <button id="submitScoreButton">Bestätigen</button>
             </div>
-            <!-- Highscore-Liste -->
+            <!-- Highscore list -->
             <div id="highScoreList">
                 <h2>Highscores</h2>
                 <ol id="highScores"></ol>
             </div>
-            <!-- Neustart-Button -->
-            <button id="restartButton">Neustart 🔄</button>
-            <!-- Reset-Button für Highscores -->
+            <!-- New Game button -->
+            <button id="restartButton">Neues Spiel 🔄</button>
+            <!-- Reset Highscores button -->
             <button id="resetHighscoresButton">Highscores zurücksetzen</button>
         </div>
     </div>
 
-    <!-- Spielinformationen -->
+    <!-- Game information -->
     <div class="game-info">
         <div id="lives">Leben: ❤️❤️❤️</div>
         <div id="currentHole">Aktuelles Ziel: Loch 1</div>
     </div>
 
-    <!-- Steuerungen -->
+    <!-- Controls -->
     <div class="controls">
         <div class="side-buttons">
             <button id="leftUp">⬆️</button>
             <button id="leftDown">⬇️</button>
         </div>
         <div class="center-controls">
+            <!-- Timer -->
             <div id="timer">Zeit: 00:00</div>
-            <!-- Neustart-Button -->
-            <button id="gameResetButton">🔄 Neustart</button>
+            <!-- Restart button -->
+            <button id="gameResetButton">🔄</button>
         </div>
         <div class="side-buttons">
             <button id="rightUp">⬆️</button>
@@ -62,7 +63,7 @@
         </div>
     </div>
 
-    <!-- Einbindung der JavaScript-Module -->
+    <!-- Include JavaScript modules -->
     <script type="module" src="src/js/main.js"></script>
 </body>
 </html>

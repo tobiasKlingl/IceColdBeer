@@ -2,49 +2,61 @@
 
 /**
  * config.js
- * Enthält alle konfigurierbaren Parameter des Spiels.
+ * Contains all configurable parameters of the game.
  */
 
 export const config = {
-    // Canvas-Einstellungen
-    canvasWidthPercentage: 1.0,    // 100% der verfügbaren Breite innerhalb des Containers
-    canvasHeightPercentage: 0.7,   // 70% der verfügbaren Höhe innerhalb des Containers
+    // Canvas Settings
+    canvasMarginPercentage: 0.025,    // 2.5% margin around the canvas
+    canvasHeightPercentage: 0.65,     // 65% of the available viewport height
 
-    // Ball-Eigenschaften
-    ballRadius: 10,                 // Kugelradius in Pixel
-    ballColor: "#cccccc",          // Farbe der Kugel
-    ballStartOffsetX: 50,           // Horizontaler Abstand vom rechten Rand in Pixel
-    ballStartOffsetY: 100,          // Vertikaler Abstand vom unteren Rand in Pixel
+    // Header Settings
+    headerHeight: '8vh',              // 8% of the viewport height
+    headerBackgroundOpacity: 0.8,     // Transparency of the header (0.0 - 1.0)
 
-    // Stangen-Eigenschaften
-    barHeight: 4,                   // Stangenhöhe in Pixel
-    barColor: "#00bcd4",            // Farbe der Stange
-    baseBarSpeed: 2,                // Grundgeschwindigkeit der Stange
-    barStartOffsetY: 80,            // Vertikaler Abstand vom unteren Rand in Pixel
+    // Element Transparency Settings
+    elementBackgroundOpacity: 0.7,    // General transparency for UI elements (0.0 - 1.0)
 
-    // Spielparameter
-    gravity: 0.5,                   // Schwerkraft
-    friction: 0.95,                 // Reibung
+    // Ball Properties
+    ballRadius: 10,
+    ballColor: "#cccccc",
+    ballStartOffsetX: 50,
+    ballStartOffsetYPercentage: 0.90,
 
-    // Loch-Einstellungen
-    holeOverlapThreshold: 1.0,          // Prozentsatz der Überlappung für Kollision (1.0 = 100%)
-    currentTargetHoleColor: "#FFD700",   // Farbe für aktuelles Ziel (Gold)
-    otherTargetHoleColor: "#90EE90",     // Farbe für andere Ziele (Hellgrün)
-    missHoleColor: "#000000",            // Farbe für Verlustlöcher (Schwarz)
-    holeNumberColor: "#000000",          // Farbe der Zahlen über den Löchern
-    totalLevels: 10,                     // Gesamtanzahl der Level
+    // Bar Properties
+    barHeight: 4,
+    barColor: "#00bcd4",
+    baseBarSpeed: 2,
+    barStartYPercentage: 0.95,
 
-    // Layout-Einstellungen
-    topSpacingPercentage: 0.05,          // 5% Leerraum oben
+    // Game Parameters
+    gravity: 0.5,
+    friction: 0.95,
 
-    // Schrift-Einstellungen
-    fontSizePercentage: 0.03,            // Schriftgröße relativ zur Canvas-Höhe
-    fontFamily: 'Arial',                 // Schriftart
-    fontColor: '#000000',                // Farbe der Schrift über den Löchern
+    // Hole Settings
+    holeOverlapThreshold: 1.0,
+    currentTargetHoleColor: "#FFD700",
+    otherTargetHoleColor: "#90EE90",
+    missHoleColor: "#000000",
+    holeNumberColor: "#000000",
+    totalLevels: 10,
 
-    // Lebenssystem
-    maxLives: 3,                          // Maximale Anzahl an Leben
+    // Font Settings
+    fontSizePercentage: 0.03,
+    fontFamily: 'Arial',
+    fontColor: '#000000',
 
-    // Anzeige-Einstellungen
-    showNumbersOnMissHoles: false,       // Nummern über Verlustlöchern anzeigen (true oder false)
+    // Life System
+    maxLives: 3,
+
+    // Display Settings
+    showNumbersOnMissHoles: false,
+
+    // Button Settings
+    buttonSize: '13.5vh',             // 10% smaller than before
+    buttonFontSize: '4.5vh',
+    restartButtonSize: '16vh',        // Increased size for the restart button
+
+    // Timer Settings
+    timerUpdateInterval: 1000
 };

@@ -8,17 +8,17 @@
 import { gameState, resetGame } from './gameState.js';
 import { config } from './config.js';
 import { updateDisplay } from './ui.js';
-//import { showEndScreen } from './highscore.js';
-
 
 /**
  * Interval-IDs für die Bewegung der Stangen.
+ * Diese Variablen speichern die Intervalle für die Bewegung der linken und rechten Stange.
  */
 let leftInterval = null;
 let rightInterval = null;
 
-/** Funktion zum Zurücksetzen des Spiels
- * Setzt den Spielzustand zurück und stoppt alle laufenden Intervalle
+/**
+ * Funktion zum Zurücksetzen der Spiel-Logik.
+ * Stoppt alle laufenden Intervalle und setzt das Spiel zurück.
  */
 export function resetGameLogic() {
     // Stoppe alle laufenden Intervalle
@@ -37,8 +37,8 @@ export function resetGameLogic() {
 
 /**
  * Funktion zum Starten der Bewegung einer Stange.
- * @param {string} barSide - 'left' oder 'right'
- * @param {number} direction - -1 für aufwärts, 1 für abwärts
+ * @param {string} barSide - 'left' oder 'right' zur Auswahl der Stange.
+ * @param {number} direction - -1 für aufwärts, 1 für abwärts.
  */
 export function startMoving(barSide, direction) {
     const barSpeed = config.baseBarSpeed;
@@ -46,22 +46,21 @@ export function startMoving(barSide, direction) {
         if (leftInterval) clearInterval(leftInterval);
         leftInterval = setInterval(function() {
             gameState.bar.leftY += direction * barSpeed;
+            // Begrenze die Bewegung innerhalb des Canvas
             gameState.bar.leftY = Math.max(0, Math.min(gameState.canvas.height, gameState.bar.leftY));
-            checkCollision();
-        }, 16); // Etwa 60 Frames pro Sekunde
+        }, 16); // Aktualisierung ca. 60 Mal pro Sekunde
     } else if (barSide === 'right') {
         if (rightInterval) clearInterval(rightInterval);
         rightInterval = setInterval(function() {
             gameState.bar.rightY += direction * barSpeed;
             gameState.bar.rightY = Math.max(0, Math.min(gameState.canvas.height, gameState.bar.rightY));
-            checkCollision();
         }, 16);
     }
 }
 
 /**
  * Funktion zum Stoppen der Bewegung einer Stange.
- * @param {string} barSide - 'left' oder 'right'
+ * @param {string} barSide - 'left' oder 'right' zur Auswahl der Stange.
  */
 export function stopMoving(barSide) {
     if (barSide === 'left' && leftInterval) {
@@ -71,12 +70,4 @@ export function stopMoving(barSide) {
         clearInterval(rightInterval);
         rightInterval = null;
     }
-}
-
-/**
- * Beispielhafte Funktion zur Kollisionserkennung zwischen Ball und Stange.
- */
-
-function checkCollision() {
-    // ToDo
 }

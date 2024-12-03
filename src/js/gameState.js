@@ -6,7 +6,7 @@
  */
 
 import { config } from './config.js';
-import { holesData } from '../data/holesData.js';
+import { holesData } from '../data/holeData.js';
 import { setupInputHandlers } from './input.js';
 import { draw } from './render.js';
 import { initializeUI, updateDisplay } from './ui.js';
@@ -39,35 +39,37 @@ export const gameState = {
 
 /**
  * Funktion zum Zurücksetzen des Spiels.
- * Setzt die Position des Balls und der Stangen zurück, stoppt Bewegung und startet den Timer neu.
  */
 export function resetGame() {
-    gameState.lives = config.maxLives;
-    gameState.currentTarget = 1;
     gameState.gameOver = false;
 
-    // Ball-Position und -Geschwindigkeit zurücksetzen
-    gameState.ball.x = gameState.canvas.width - config.ballStartOffsetX; // Startposition der Kugel vom rechten Rand
-    gameState.ball.y = gameState.canvas.height - config.ballStartOffsetY; // Startposition der Kugel vom unteren Rand
+    // Canvas-Größe aktualisieren
+    resizeCanvas();
+
+    // Ball initialisieren
+    gameState.ball.x = gameState.canvas.width - config.ballStartOffsetX;
+    gameState.ball.y = gameState.canvas.height * config.ballStartOffsetYPercentage;
     gameState.ball.speedX = 0;
     gameState.ball.speedY = 0;
     gameState.ball.radius = config.ballRadius;
     gameState.ball.color = config.ballColor;
 
-    // Stangenposition und -eigenschaften zurücksetzen
-    gameState.bar.leftY = gameState.canvas.height - config.barStartOffsetY; // Startposition der linken Stange
-    gameState.bar.rightY = gameState.canvas.height - config.barStartOffsetY; // Startposition der rechten Stange
+    // Stange initialisieren
+    const barStartY = gameState.canvas.height * config.barStartYPercentage;
+    gameState.bar.leftY = barStartY;
+    gameState.bar.rightY = barStartY;
     gameState.bar.height = config.barHeight;
     gameState.bar.color = config.barColor;
 
-    // Löcher neu berechnen basierend auf der aktuellen Canvas-Größe
+    // Löcher skalieren
     gameState.holes.forEach(hole => {
         hole.actualX = hole.x * gameState.canvas.width;
         hole.actualY = hole.y * gameState.canvas.height;
-        hole.actualRadius = hole.radius * gameState.canvas.width * 1.0; // Skalierung basierend auf der Canvas-Breite
+        const scalingFactor = Math.min(gameState.canvas.width, gameState.canvas.height);
+        hole.actualRadius = hole.radius * scalingFactor;
     });
 
-    // Timer starten, falls es das erste Level ist und volle Leben vorhanden sind
+    // Timer initialisieren
     if (gameState.currentTarget === 1 && gameState.lives === config.maxLives) {
         gameState.startTime = Date.now();
         gameState.elapsedTime = 0;
@@ -75,7 +77,7 @@ export function resetGame() {
         gameState.timerInterval = setInterval(function() {
             gameState.elapsedTime = Math.floor((Date.now() - gameState.startTime) / 1000);
             updateDisplay();
-        }, 1000);
+        }, config.timerUpdateInterval);
     }
 
     // Anzeige aktualisieren
@@ -84,51 +86,52 @@ export function resetGame() {
 
 /**
  * Funktion zur Initialisierung des Spiels.
- * Setzt Canvas, UI und Spielvariablen auf.
  */
 export function initializeGame() {
-    // Canvas und Kontext initialisieren
+    // Canvas initialisieren
     gameState.canvas = document.getElementById("gameCanvas");
     gameState.ctx = gameState.canvas.getContext("2d");
 
     // Canvas-Größe einstellen
     resizeCanvas();
 
-    // UI-Elemente initialisieren
+    // UI initialisieren
     initializeUI();
-
-    // Spielvariablen initialisieren
-    resetGame();
 
     // Lochdaten laden
     loadHoleData();
+
+    // Spielvariablen initialisieren
+    resetGame();
 
     // Eingabe-Handler einrichten
     setupInputHandlers();
 
     // Fenstergrößenänderung behandeln
     window.addEventListener('resize', function() {
-        resizeCanvas();
         resetGame();
     });
 
+    // Spielschleife starten
+    draw();
 }
 
 /**
- * Funktion zur Anpassung der Canvas-Größe basierend auf dem Container.
+ * Funktion zur Anpassung der Canvas-Größe.
  */
 function resizeCanvas() {
-    const container = document.querySelector('.game-container');
-    const width = container.clientWidth * config.canvasWidthPercentage;
-    const height = container.clientHeight * config.canvasHeightPercentage;
-    gameState.canvas.width = width;
-    gameState.canvas.height = height;
-    gameState.canvas.style.width = width + 'px';
-    gameState.canvas.style.height = height + 'px';
+    const viewportHeight = window.innerHeight;
+    const headerHeight = viewportHeight * (parseFloat(config.headerHeight) / 100);
+    const canvasHeight = viewportHeight * config.canvasHeightPercentage;
+
+    gameState.canvas.width = gameState.canvas.parentElement.clientWidth;
+    gameState.canvas.height = canvasHeight - headerHeight - (viewportHeight * config.canvasMarginPercentage * 2);
+    gameState.canvas.style.width = '100%';
+    gameState.canvas.style.height = 'auto';
 }
 
 /**
- * Funktion zum Laden der Lochdaten und Start des Spiels.
+ * Funktion zum Laden der Lochdaten.
  */
 function loadHoleData() {
     gameState.holes = holesData.map(hole => ({
@@ -137,7 +140,4 @@ function loadHoleData() {
         radius: hole.Radius,
         Type: hole.Type
     }));
-    resetGame();
-    // Spielschleife starten
-    draw();
 }

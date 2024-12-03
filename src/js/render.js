@@ -10,35 +10,34 @@ import { applyPhysics } from './physics.js';
 import { config } from './config.js';
 
 /**
- * Hauptzeichnungsfunktion, die kontinuierlich aufgerufen wird.
+ * Hauptzeichnungsfunktion.
  */
 export function draw() {
     // Canvas leeren
     gameState.ctx.clearRect(0, 0, gameState.canvas.width, gameState.canvas.height);
 
-    // Löcher zeichnen und nummerieren
+    // Löcher zeichnen
     gameState.holes.forEach(hole => {
         gameState.ctx.beginPath();
         gameState.ctx.arc(hole.actualX, hole.actualY, hole.actualRadius, 0, Math.PI * 2);
 
-        // Farbe basierend auf dem Typ des Lochs festlegen
-        const holeTypeNum = hole.Type;
-        if (holeTypeNum === 'M') {
-            gameState.ctx.fillStyle = config.missHoleColor; // Farbe für Verlustlöcher
-        } else if (holeTypeNum === gameState.currentTarget.toString()) {
-            gameState.ctx.fillStyle = config.currentTargetHoleColor; // Farbe für aktuelles Ziel
-        } else if (parseInt(holeTypeNum) >= 1 && parseInt(holeTypeNum) <= config.totalLevels) {
-            gameState.ctx.fillStyle = config.otherTargetHoleColor; // Farbe für andere Ziele
+        // Farbe festlegen
+        const holeTypeNum = parseInt(hole.Type);
+
+        if (holeTypeNum === gameState.currentTarget) {
+            gameState.ctx.fillStyle = config.currentTargetHoleColor;
+        } else if (holeTypeNum >= 1 && holeTypeNum <= config.totalLevels) {
+            gameState.ctx.fillStyle = config.otherTargetHoleColor;
         } else {
-            gameState.ctx.fillStyle = config.otherTargetHoleColor; // Standardfarbe
+            gameState.ctx.fillStyle = config.missHoleColor;
         }
 
         gameState.ctx.fill();
         gameState.ctx.closePath();
 
-        // Nummer über dem Loch zeichnen, falls erforderlich
-        if ((parseInt(holeTypeNum) >= 1 && parseInt(holeTypeNum) <= config.totalLevels) || config.showNumbersOnMissHoles) {
-            gameState.ctx.fillStyle = config.fontColor; // Schriftfarbe aus config.js
+        // Nummer anzeigen
+        if ((holeTypeNum >= 1 && holeTypeNum <= config.totalLevels) || config.showNumbersOnMissHoles) {
+            gameState.ctx.fillStyle = config.fontColor;
             const fontSize = gameState.canvas.height * config.fontSizePercentage;
             gameState.ctx.font = 'bold ' + fontSize + 'px ' + config.fontFamily;
             gameState.ctx.textAlign = 'center';
@@ -56,14 +55,14 @@ export function draw() {
     gameState.ctx.stroke();
     gameState.ctx.closePath();
 
-    // Ball zeichnen
+    // Kugel zeichnen
     gameState.ctx.beginPath();
     gameState.ctx.arc(gameState.ball.x, gameState.ball.y, gameState.ball.radius, 0, Math.PI * 2);
     gameState.ctx.fillStyle = gameState.ball.color;
     gameState.ctx.fill();
     gameState.ctx.closePath();
 
-    // Physik anwenden (Schwerkraft, Kollisionen etc.)
+    // Physik anwenden
     applyPhysics();
 
     // Nächsten Frame anfordern

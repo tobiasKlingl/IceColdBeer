@@ -27,7 +27,7 @@ export function updateDisplay() {
 
     // Leben als Herz-Emojis anzeigen
     let hearts = '';
-    for (let i = 0; i < lives; i++) {
+    for (let i = 0; i < gameState.lives; i++) {
         hearts += '❤️';
     }
     livesDisplay.textContent = 'Leben: ' + hearts;

@@ -5,11 +5,11 @@
  * Verwalten der Benutzereingaben (Button- und Touch-Ereignisse).
  */
 
-import { startMoving, stopMoving, resetGameLogic } from './gameLogic.js';
+import { startMoving, stopMoving } from './gameLogic.js';
+import { resetGame } from './gameState.js';
 
 /**
  * Funktion zur Einrichtung der Eingabe-Handler.
- * Bindet Ereignisse an die Steuerungselemente.
  */
 export function setupInputHandlers() {
     // Buttons für die linke Stange
@@ -20,7 +20,7 @@ export function setupInputHandlers() {
     addButtonEvent('rightUp', 'right', -1);
     addButtonEvent('rightDown', 'right', 1);
 
-    // Neustart-Button während des Spiels
+    // Neustart-Button
     const gameResetButton = document.getElementById('gameResetButton');
     gameResetButton.addEventListener('click', function() {
         resetGame();
@@ -29,9 +29,6 @@ export function setupInputHandlers() {
 
 /**
  * Hilfsfunktion zum Hinzufügen von Ereignis-Handlern zu Buttons.
- * @param {string} buttonId - Die ID des Buttons.
- * @param {string} barSide - 'left' oder 'right'.
- * @param {number} direction - -1 für aufwärts, 1 für abwärts.
  */
 function addButtonEvent(buttonId, barSide, direction) {
     const button = document.getElementById(buttonId);
@@ -50,7 +47,7 @@ function addButtonEvent(buttonId, barSide, direction) {
         stopMoving(barSide);
     });
 
-    // Touch-Ereignisse für mobile Geräte
+    // Touch-Ereignisse
     button.addEventListener('touchstart', function(event) {
         event.preventDefault();
         startMoving(barSide, direction);

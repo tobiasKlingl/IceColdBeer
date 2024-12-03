@@ -6,7 +6,7 @@
  */
 
 import { resetGameLogic } from './gameLogic.js';
-import { resetGame } from './gameState.js';
+import { resetGame, gameState } from './gameState.js';
 import { updateDisplay } from './ui.js';
 import { config } from './config.js';
 
@@ -25,21 +25,21 @@ export function showEndScreen(won) {
 
     // Endscreen anzeigen und Timer stoppen
     endScreen.style.display = 'flex';
-    clearInterval(timerInterval); // Timer stoppen
+    clearInterval(gameState.timerInterval); // Timer stoppen
 
     // Nachricht basierend auf dem Spielstatus anzeigen
     if (won) {
         endMessage.textContent = 'Herzlichen Glückwunsch! Du hast das Spiel gewonnen!';
     } else {
-        endMessage.textContent = 'Spiel vorbei! Du hast Level ' + (currentTarget - 1) + ' erreicht.';
+        endMessage.textContent = 'Spiel vorbei! Du hast Level ' + (gameState.currentTarget - 1) + ' erreicht.';
     }
 
     // Highscore-Daten erstellen
     const score = {
         name: '',
-        level: currentTarget - 1,
-        lives: lives,
-        time: elapsedTime
+        level: gameState.currentTarget - 1,
+        lives: gameState.lives,
+        time: gameState.elapsedTime
     };
 
     // Vorhandene Highscores aus localStorage abrufen
@@ -85,8 +85,8 @@ export function showEndScreen(won) {
     // Event Listener für den Neustart-Button hinzufügen
     restartButton.addEventListener('click', function() {
         endScreen.style.display = 'none';
-        lives = config.maxLives;
-        currentTarget = 1;
+        gameState.lives = config.maxLives;
+        gameState.currentTarget = 1;
         resetGame();
         updateDisplay();
         playerNameInput.value = '';
