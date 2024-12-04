@@ -5,25 +5,28 @@
  * Enthält Hilfsfunktionen, die im gesamten Spiel verwendet werden können.
  */
 
-/**
- * Funktion zum Deaktivieren des Zooms auf mobilen Geräten.
- * Verhindert, dass Benutzer versehentlich das Spiel vergrößern oder verkleinern.
- */
-export function disableZoom() {
-    const meta = document.createElement('meta');
-    meta.name = "viewport";
-    meta.id = "noZoomMeta";
-    meta.content = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no";
-    document.head.appendChild(meta);
-}
+import { config } from './config.js';
 
 /**
- * Funktion zum Aktivieren des Zooms auf mobilen Geräten.
- * Entfernt die Deaktivierung des Zooms.
+ * Funktion zum Setzen der CSS-Variablen basierend auf config.js
  */
-export function enableZoom() {
-    const noZoomMeta = document.getElementById('noZoomMeta');
-    if (noZoomMeta) {
-        noZoomMeta.parentNode.removeChild(noZoomMeta);
-    }
+export function setCSSVariables() {
+    const root = document.documentElement;
+
+    root.style.setProperty('--header-height', config.headerHeight);
+    root.style.setProperty('--header-opacity', config.headerBackgroundOpacity);
+    root.style.setProperty('--element-opacity', config.elementBackgroundOpacity);
+    root.style.setProperty('--button-size', config.buttonSize);
+    root.style.setProperty('--restart-button-size', config.restartButtonSize);
+    root.style.setProperty('--button-font-size', config.buttonFontSize);
+    root.style.setProperty('--config-playfield-border-width', config.playfieldBorderWidth);
+    root.style.setProperty('--config-playfield-border-color', config.colors.playfieldBorderColor);
+    root.style.setProperty('--config-header-background-color', config.colors.headerBackgroundColor);
+    root.style.setProperty('--config-button-color', config.colors.buttonColor);
+    root.style.setProperty('--config-button-hover-color', config.colors.buttonHoverColor);
+
+    // Neue CSS-Variablen für Margins
+    root.style.setProperty('--playfield-top-margin', config.playfieldTopMargin);
+    root.style.setProperty('--playfield-bottom-margin', config.playfieldBottomMargin);
+    root.style.setProperty('--controls-bottom-margin', config.controlsBottomMargin);
 }

@@ -18,38 +18,52 @@ export function draw() {
 
     // Löcher zeichnen
     gameState.holes.forEach(hole => {
-        gameState.ctx.beginPath();
-        gameState.ctx.arc(hole.actualX, hole.actualY, hole.actualRadius, 0, Math.PI * 2);
-
-        // Farbe festlegen
+        // Lochfarbe bestimmen
+        let holeColor;
         const holeTypeNum = parseInt(hole.Type);
 
         if (holeTypeNum === gameState.currentTarget) {
-            gameState.ctx.fillStyle = config.currentTargetHoleColor;
+            holeColor = config.colors.currentTargetHoleColor;
         } else if (holeTypeNum >= 1 && holeTypeNum <= config.totalLevels) {
-            gameState.ctx.fillStyle = config.otherTargetHoleColor;
+            holeColor = config.colors.otherTargetHoleColor;
         } else {
-            gameState.ctx.fillStyle = config.missHoleColor;
+            holeColor = config.colors.missHoleColor;
         }
 
+        // Loch füllen
+        gameState.ctx.beginPath();
+        gameState.ctx.arc(hole.actualX, hole.actualY, hole.actualRadius, 0, Math.PI * 2);
+        gameState.ctx.fillStyle = holeColor;
         gameState.ctx.fill();
+        gameState.ctx.closePath();
+
+        // Weißen Rand zeichnen
+        gameState.ctx.beginPath();
+        gameState.ctx.arc(hole.actualX, hole.actualY, hole.actualRadius, 0, Math.PI * 2);
+        gameState.ctx.lineWidth = config.holeBorderWidth;
+        gameState.ctx.strokeStyle = config.colors.holeBorderColor;
+        gameState.ctx.stroke();
         gameState.ctx.closePath();
 
         // Nummer anzeigen
         if ((holeTypeNum >= 1 && holeTypeNum <= config.totalLevels) || config.showNumbersOnMissHoles) {
             gameState.ctx.fillStyle = config.fontColor;
-            const fontSize = gameState.canvas.height * config.fontSizePercentage;
+            const fontSize = gameState.canvas.height * config.fontSizePercentage / (window.devicePixelRatio || 1);
             gameState.ctx.font = 'bold ' + fontSize + 'px ' + config.fontFamily;
             gameState.ctx.textAlign = 'center';
             gameState.ctx.textBaseline = 'middle';
-            gameState.ctx.fillText(holeTypeNum, hole.actualX, hole.actualY - hole.actualRadius - fontSize / 2);
+            gameState.ctx.fillText(
+                holeTypeNum,
+                hole.actualX,
+                hole.actualY - hole.actualRadius - 3.5*config.holeBorderWidth
+            );
         }
     });
 
     // Stange zeichnen
     gameState.ctx.beginPath();
     gameState.ctx.moveTo(0, gameState.bar.leftY);
-    gameState.ctx.lineTo(gameState.canvas.width, gameState.bar.rightY);
+    gameState.ctx.lineTo(gameState.canvas.width / (window.devicePixelRatio || 1), gameState.bar.rightY);
     gameState.ctx.lineWidth = gameState.bar.height;
     gameState.ctx.strokeStyle = gameState.bar.color;
     gameState.ctx.stroke();

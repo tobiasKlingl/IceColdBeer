@@ -40,3 +40,21 @@ export function updateDisplay() {
     const seconds = (gameState.elapsedTime % 60).toString().padStart(2, '0');
     timerDisplay.textContent = 'Zeit: ' + minutes + ':' + seconds;
 }
+
+/**
+ * Funktion zum Anzeigen einer temporären Nachricht auf dem Bildschirm.
+ * @param {string} message - Die anzuzeigende Nachricht.
+ * @param {number} duration - Anzeigedauer in Millisekunden.
+ * @param {function} callback - Funktion, die nach Ablauf ausgeführt wird.
+ */
+export function showTemporaryMessage(message, duration, callback) {
+    const messageOverlay = document.createElement('div');
+    messageOverlay.className = 'message-overlay';
+    messageOverlay.textContent = message;
+    document.body.appendChild(messageOverlay);
+
+    setTimeout(() => {
+        document.body.removeChild(messageOverlay);
+        if (callback) callback();
+    }, duration);
+}

@@ -2,61 +2,84 @@
 
 /**
  * config.js
- * Contains all configurable parameters of the game.
+ * Enthält alle konfigurierbaren Parameter des Spiels.
  */
 
 export const config = {
-    // Canvas Settings
-    canvasMarginPercentage: 0.025,    // 2.5% margin around the canvas
-    canvasHeightPercentage: 0.65,     // 65% of the available viewport height
+    // Canvas-Einstellungen
+    canvasHeightPercentage: 0.6,
 
-    // Header Settings
-    headerHeight: '8vh',              // 8% of the viewport height
-    headerBackgroundOpacity: 0.8,     // Transparency of the header (0.0 - 1.0)
+    // Header-Einstellungen
+    headerHeight: '6vh',
+    headerBackgroundOpacity: 0.8,
 
-    // Element Transparency Settings
-    elementBackgroundOpacity: 0.7,    // General transparency for UI elements (0.0 - 1.0)
+    // Margins für Spielfeld
+    playfieldTopMargin: '1vh',
+    playfieldBottomMargin: '1vh',
 
-    // Ball Properties
-    ballRadius: 10,
-    ballColor: "#cccccc",
-    ballStartOffsetX: 50,
-    ballStartOffsetYPercentage: 0.90,
+    // Element-Transparenzeinstellungen
+    elementBackgroundOpacity: 0.7,
 
-    // Bar Properties
-    barHeight: 4,
-    barColor: "#00bcd4",
-    baseBarSpeed: 2,
+    // Ball-Eigenschaften
+    ballRadius: 7,
+    ballColor: '#444444',
+
+    // Stangen-Eigenschaften
+    barHeight: 5,
+    barColor: 'rgba(255, 165, 0, 0.8)',
+    baseBarSpeed: 0.1, // Reduziert von 1.5 auf 0.5
+
     barStartYPercentage: 0.95,
 
-    // Game Parameters
+    // Physikparameter
     gravity: 0.5,
-    friction: 0.95,
+    friction: 0.99,
+    staticFrictionThreshold: 0.01, // Schwellenwert für die Haftreibung
 
-    // Hole Settings
-    holeOverlapThreshold: 1.0,
-    currentTargetHoleColor: "#FFD700",
-    otherTargetHoleColor: "#90EE90",
-    missHoleColor: "#000000",
-    holeNumberColor: "#000000",
-    totalLevels: 10,
+    // Wanddämpfung
+    wallBounceDamping: 0.66, // Zwischen 0 und 1
 
-    // Font Settings
+    // Loch-Einstellungen
+    holeOverlapThreshold: 0.85,
+    holeBorderWidth: 2,
+    colors: {
+        currentTargetHoleColor: 'rgba(255, 255, 0, 0.8)',
+        otherTargetHoleColor: 'rgba(0, 255, 0, 0.8)',
+        missHoleColor: 'rgba(255, 0, 0, 0.8)',
+        holeBorderColor: 'rgba(255, 255, 255, 1)',
+        playfieldBorderColor: 'rgba(139, 69, 19, 0.8)',
+        buttonColor: 'rgba(0, 128, 255, 0.8)',
+        buttonHoverColor: 'rgba(0, 102, 204, 0.8)',
+        headerBackgroundColor: 'rgba(255, 215, 0, 0.8)',
+    },
+    playfieldBorderWidth: '5px',
+
+    // Schriftart-Einstellungen
     fontSizePercentage: 0.03,
     fontFamily: 'Arial',
     fontColor: '#000000',
 
-    // Life System
+    // Lebenssystem
     maxLives: 3,
 
-    // Display Settings
+    // Anzeigeeinstellungen
     showNumbersOnMissHoles: false,
 
-    // Button Settings
-    buttonSize: '13.5vh',             // 10% smaller than before
+    // Button-Einstellungen
+    buttonSize: '10.4vh', // Angepasst
     buttonFontSize: '4.5vh',
-    restartButtonSize: '16vh',        // Increased size for the restart button
+    restartButtonSize: '16vh',
+    arrowButtonMargin: '5px', // Standardwert
 
-    // Timer Settings
-    timerUpdateInterval: 1000
+    // Timer-Einstellungen
+    timerUpdateInterval: 1000,
+
+    // Gesamtanzahl der Level
+    totalLevels: 10,
+
+    // Margin unter den Steuerungsbuttons
+    controlsBottomMargin: '2vh',
+
+    // Delta-Y für Lochverschiebung (Bruchteil der Canvas-Höhe)
+    deltaYFraction: 0.06,
 };

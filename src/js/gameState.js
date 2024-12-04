@@ -6,7 +6,7 @@
  */
 
 import { config } from './config.js';
-import { holesData } from '../data/holeData.js';
+import { holesData } from '../data/holesData.js';
 import { setupInputHandlers } from './input.js';
 import { draw } from './render.js';
 import { initializeUI, updateDisplay } from './ui.js';
@@ -27,70 +27,89 @@ export const gameState = {
         leftY: 0,
         rightY: 0,
         height: 0,
-        color: ''
+        color: '',
+        leftYSpeed: 0,   // Hinzugefügt
+        rightYSpeed: 0   // Hinzugefügt
     },
     startTime: null,
     elapsedTime: 0,
     timerInterval: null,
     lives: config.maxLives,
     currentTarget: 1,
-    gameOver: false
+    gameOver: false,
+    ballInHole: false
 };
 
-/**
- * Funktion zum Zurücksetzen des Spiels.
- */
 export function resetGame() {
     gameState.gameOver = false;
+    gameState.ballInHole = false;
+    document.body.classList.remove('showing-end-screen');
 
     // Canvas-Größe aktualisieren
     resizeCanvas();
 
-    // Ball initialisieren
-    gameState.ball.x = gameState.canvas.width - config.ballStartOffsetX;
-    gameState.ball.y = gameState.canvas.height * config.ballStartOffsetYPercentage;
-    gameState.ball.speedX = 0;
-    gameState.ball.speedY = 0;
-    gameState.ball.radius = config.ballRadius;
-    gameState.ball.color = config.ballColor;
+    // Stange und Kugel initialisieren
+    initializeBarAndBall();
 
-    // Stange initialisieren
-    const barStartY = gameState.canvas.height * config.barStartYPercentage;
-    gameState.bar.leftY = barStartY;
-    gameState.bar.rightY = barStartY;
-    gameState.bar.height = config.barHeight;
-    gameState.bar.color = config.barColor;
-
-    // Löcher skalieren
-    gameState.holes.forEach(hole => {
-        hole.actualX = hole.x * gameState.canvas.width;
-        hole.actualY = hole.y * gameState.canvas.height;
-        const scalingFactor = Math.min(gameState.canvas.width, gameState.canvas.height);
-        hole.actualRadius = hole.radius * scalingFactor;
-    });
-
-    // Timer initialisieren
-    if (gameState.currentTarget === 1 && gameState.lives === config.maxLives) {
-        gameState.startTime = Date.now();
-        gameState.elapsedTime = 0;
-        clearInterval(gameState.timerInterval);
-        gameState.timerInterval = setInterval(function() {
-            gameState.elapsedTime = Math.floor((Date.now() - gameState.startTime) / 1000);
-            updateDisplay();
-        }, config.timerUpdateInterval);
-    }
+    // Löcher skalieren und Position anpassen
+    scaleAndPositionHoles();
 
     // Anzeige aktualisieren
     updateDisplay();
 }
 
-/**
- * Funktion zur Initialisierung des Spiels.
- */
+export function resetTimer() {
+    // Timer zurücksetzen
+    clearInterval(gameState.timerInterval);
+    gameState.startTime = Date.now();
+    gameState.elapsedTime = 0;
+    gameState.timerInterval = setInterval(function() {
+        gameState.elapsedTime = Math.floor((Date.now() - gameState.startTime) / 1000);
+        updateDisplay();
+    }, config.timerUpdateInterval);
+}
+
+function initializeBarAndBall() {
+    const adjustedWidth = gameState.canvas.width / (window.devicePixelRatio || 1);
+    const adjustedHeight = gameState.canvas.height / (window.devicePixelRatio || 1);
+
+    // Stange initialisieren
+    const barStartY = adjustedHeight * config.barStartYPercentage;
+    gameState.bar.leftY = barStartY;
+    gameState.bar.rightY = barStartY;
+    gameState.bar.leftYSpeed = 0;  // Initialisieren
+    gameState.bar.rightYSpeed = 0; // Initialisieren
+    gameState.bar.height = config.barHeight;
+    gameState.bar.color = config.barColor;
+
+    // Kugel initialisieren
+    gameState.ball.radius = config.ballRadius;
+    gameState.ball.color = config.ballColor;
+    gameState.ball.x = adjustedWidth * 0.9; // Startet bei 90% der Breite
+    gameState.ball.y = gameState.bar.leftY - gameState.ball.radius - gameState.bar.height / 2;
+    gameState.ball.speedX = 0;
+    gameState.ball.speedY = 0;
+}
+
+function scaleAndPositionHoles() {
+    gameState.holes.forEach(hole => {
+        const adjustedWidth = gameState.canvas.width / (window.devicePixelRatio || 1);
+        const adjustedHeight = gameState.canvas.height / (window.devicePixelRatio || 1);
+
+        hole.actualX = hole.x * adjustedWidth;
+        const deltaY = config.deltaYFraction * adjustedHeight;
+        hole.actualY = hole.y * adjustedHeight + deltaY;
+        const scalingFactor = Math.min(adjustedWidth, adjustedHeight);
+        hole.actualRadius = hole.radius * scalingFactor;
+    });
+}
 export function initializeGame() {
     // Canvas initialisieren
     gameState.canvas = document.getElementById("gameCanvas");
     gameState.ctx = gameState.canvas.getContext("2d");
+
+    // CSS-Variablen setzen
+    document.documentElement.style.setProperty('--arrow-button-margin', config.arrowButtonMargin);
 
     // Canvas-Größe einstellen
     resizeCanvas();
@@ -103,6 +122,7 @@ export function initializeGame() {
 
     // Spielvariablen initialisieren
     resetGame();
+    resetTimer();
 
     // Eingabe-Handler einrichten
     setupInputHandlers();
@@ -116,23 +136,32 @@ export function initializeGame() {
     draw();
 }
 
-/**
- * Funktion zur Anpassung der Canvas-Größe.
- */
 function resizeCanvas() {
+    const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
     const headerHeight = viewportHeight * (parseFloat(config.headerHeight) / 100);
-    const canvasHeight = viewportHeight * config.canvasHeightPercentage;
 
-    gameState.canvas.width = gameState.canvas.parentElement.clientWidth;
-    gameState.canvas.height = canvasHeight - headerHeight - (viewportHeight * config.canvasMarginPercentage * 2);
-    gameState.canvas.style.width = '100%';
-    gameState.canvas.style.height = 'auto';
+    const availableHeight = viewportHeight - headerHeight;
+
+    const canvasHeight = availableHeight * config.canvasHeightPercentage;
+    const canvasWidth = viewportWidth * 0.95; // 95% der verfügbaren Breite
+
+    // Device Pixel Ratio
+    const dpr = window.devicePixelRatio || 1;
+
+    // Canvas-Größe in Pixeln setzen
+    gameState.canvas.width = canvasWidth * dpr;
+    gameState.canvas.height = canvasHeight * dpr;
+
+    // CSS-Größe des Canvas setzen
+    gameState.canvas.style.width = `${canvasWidth}px`;
+    gameState.canvas.style.height = `${canvasHeight}px`;
+
+    // Kontext skalieren
+    gameState.ctx.setTransform(1, 0, 0, 1, 0, 0);
+    gameState.ctx.scale(dpr, dpr);
 }
 
-/**
- * Funktion zum Laden der Lochdaten.
- */
 function loadHoleData() {
     gameState.holes = holesData.map(hole => ({
         x: hole.X,

@@ -1,14 +1,22 @@
 /* style.css */
 
-/* Variables from config.js */
+/* Standardwerte für CSS-Variablen */
 :root {
-    --header-height: 8vh; /* From config.js */
-    --header-opacity: 0.8; /* From config.js */
-    --element-opacity: 0.7; /* From config.js */
-    --canvas-margin: 2.5%; /* From config.js */
-    --button-size: 13.5vh; /* From config.js */
-    --restart-button-size: 16vh; /* From config.js */
-    --button-font-size: 4.5vh; /* From config.js */
+    --header-height: 6vh;
+    --header-opacity: 0.8;
+    --element-opacity: 0.7;
+    --button-size: 10.4vh; /* Angepasst auf 10.4vh */
+    --restart-button-size: 16vh;
+    --button-font-size: 4.5vh;
+    --playfield-border-width: var(--config-playfield-border-width);
+    --playfield-border-color: var(--config-playfield-border-color);
+    --header-background-color: var(--config-header-background-color);
+    --button-color: var(--config-button-color);
+    --button-hover-color: var(--config-button-hover-color);
+    --playfield-top-margin: var(--playfield-top-margin);
+    --playfield-bottom-margin: var(--playfield-bottom-margin);
+    --controls-bottom-margin: var(--controls-bottom-margin);
+    --arrow-button-margin: 5px; /* Standardwert, kann angepasst werden */
 }
 
 body, html {
@@ -16,16 +24,18 @@ body, html {
     padding: 0;
     width: 100%;
     height: 100%;
-    overflow: hidden; /* Prevent scrolling */
+    overflow: hidden;
     font-family: Arial, sans-serif;
     background-image: url('assets/retro_background.png');
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
+    padding-bottom: env(safe-area-inset-bottom);
+    font-weight: bold; /* Alle Texte fett darstellen */
 }
 
 header {
-    background-color: rgba(255, 235, 59, var(--header-opacity));
+    background-color: var(--header-background-color);
     text-align: center;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     height: var(--header-height);
@@ -40,33 +50,33 @@ header h1 {
 
 .game-container {
     position: relative;
-    max-width: 800px;
-    margin: var(--canvas-margin) auto;
+    max-width: 95%;
+    margin: var(--playfield-top-margin) auto var(--playfield-bottom-margin);
     background-color: rgba(255, 255, 255, var(--element-opacity));
     border-radius: 10px;
     overflow: hidden;
+    border: var(--playfield-border-width) solid var(--playfield-border-color);
 }
 
 #gameCanvas {
-    width: 100%;
-    height: calc(var(--canvas-height) - var(--header-height));
     display: block;
     margin: 0 auto;
 }
 
 #endScreen {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, var(--element-opacity));
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.9);
     color: #fff;
     display: none;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    z-index: 10;
+    z-index: 1000;
+    overflow-y: auto;
 }
 
 #endScreen > div, #endScreen > button {
@@ -85,59 +95,65 @@ header h1 {
     margin-bottom: 10px;
     border: none;
     border-radius: 5px;
-    width: 80%; /* Increased width for better layout */
+    width: 80%;
 }
 
 #submitScoreButton {
     padding: 10px 20px;
     margin: 5px;
-    background-color: #ff4d4d;
+    background-color: var(--button-color);
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     font-size: 2.5vh;
     transition: background-color 0.3s ease;
-    width: 80%; /* Match width with input field */
+    width: 80%;
 }
 
 #restartButton, #resetHighscoresButton {
     padding: 10px 20px;
-    margin: 10px 0; /* Increased margin for spacing */
-    background-color: #ff4d4d;
+    margin: 10px 0;
+    background-color: var(--button-color);
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     font-size: 2.5vh;
     transition: background-color 0.3s ease;
-    width: 80%; /* Increased width */
+    width: 80%;
 }
 
 #submitScoreButton:hover, #restartButton:hover, #resetHighscoresButton:hover {
-    background-color: #e60000;
+    background-color: var(--button-hover-color);
+}
+
+.game-info, .controls {
+    background-color: var(--header-background-color);
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
 }
 
 .game-info {
     display: flex;
-    justify-content: space-around;
-    align-items: center; /* Center align vertically */
+    justify-content: space-between;
+    align-items: center;
     padding: 5px;
-    background-color: rgba(255, 255, 255, var(--element-opacity));
-    box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
 }
 
 .game-info > div {
+    display: flex;
+    align-items: center;
     font-size: 2vh;
+    margin: 0 10px; /* Abstand zu den Rändern */
 }
 
 .controls {
     display: flex;
     justify-content: space-between;
-    align-items: center; /* Center align vertically */
+    align-items: center;
     padding: 5px;
-    background-color: rgba(255, 255, 255, var(--element-opacity));
-    box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+    padding-bottom: calc(20px + env(safe-area-inset-bottom));
+    margin-bottom: var(--controls-bottom-margin);
 }
 
 .side-buttons, .center-controls {
@@ -146,11 +162,19 @@ header h1 {
     align-items: center;
 }
 
+#timer {
+    margin-bottom: 5px;
+    font-size: 2vh;
+}
+
 .side-buttons > button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: var(--arrow-button-margin);
     width: var(--button-size);
     height: var(--button-size);
-    margin: 5px;
-    background-color: rgba(0, 188, 212, var(--element-opacity));
+    background-color: var(--button-color);
     color: white;
     border: none;
     border-radius: 10px;
@@ -162,21 +186,21 @@ header h1 {
 .center-controls > button#gameResetButton {
     width: var(--restart-button-size);
     height: var(--restart-button-size);
-    background-color: rgba(0, 188, 212, var(--element-opacity));
+    background-color: var(--button-color);
     color: white;
     border: none;
-    border-radius: 50%; /* Make it circular */
+    border-radius: 50%;
     cursor: pointer;
     font-size: 2.5vh;
     transition: background-color 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0; /* Remove margins for better centering */
+    margin: 0;
 }
 
 .side-buttons > button:hover, .center-controls > button:hover {
-    background-color: rgba(0, 151, 167, var(--element-opacity));
+    background-color: var(--button-hover-color);
 }
 
 #highScores {
@@ -187,6 +211,26 @@ header h1 {
 #highScores > li {
     margin: 5px 0;
     font-size: 2vh;
+}
+
+.message-overlay {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 20px 30px;
+    border-radius: 10px;
+    font-size: 2.5vh;
+    text-align: center;
+    z-index: 1000;
+}
+
+.showing-end-screen .controls,
+.showing-end-screen .game-info,
+.showing-end-screen .game-container {
+    filter: blur(5px);
 }
 
 @media (max-width: 768px) {

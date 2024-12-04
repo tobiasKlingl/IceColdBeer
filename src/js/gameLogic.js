@@ -11,7 +11,6 @@ import { updateDisplay } from './ui.js';
 
 /**
  * Interval-IDs für die Bewegung der Stangen.
- * Diese Variablen speichern die Intervalle für die Bewegung der linken und rechten Stange.
  */
 let leftInterval = null;
 let rightInterval = null;
