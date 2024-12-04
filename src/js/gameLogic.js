@@ -5,7 +5,7 @@
  * Enthält die Spiellogik, einschließlich Bewegung, Kollision und Spielstatus.
  */
 
-import { gameState, resetGame } from './gameState.js';
+import { gameState } from './gameState.js';
 import { config } from './config.js';
 import { updateDisplay } from './ui.js';
 
@@ -18,7 +18,7 @@ let rightInterval = null;
 /**
  * Funktion zum Zurücksetzen der Spiel-Logik.
  * Stoppt alle laufenden Intervalle und setzt das Spiel zurück.
- */
+
 export function resetGameLogic() {
     // Stoppe alle laufenden Intervalle
     if (leftInterval) {
@@ -32,7 +32,7 @@ export function resetGameLogic() {
 
     // Setze den Spielzustand zurück
     resetGame();
-}
+}*/
 
 /**
  * Funktion zum Starten der Bewegung einer Stange.
@@ -44,14 +44,14 @@ export function startMoving(barSide, direction) {
     if (barSide === 'left') {
         if (leftInterval) clearInterval(leftInterval);
         leftInterval = setInterval(function() {
-            gameState.bar.leftY += direction * barSpeed;
+            gameState.bar.leftY = direction * barSpeed;
             // Begrenze die Bewegung innerhalb des Canvas
             gameState.bar.leftY = Math.max(0, Math.min(gameState.canvas.height, gameState.bar.leftY));
         }, 16); // Aktualisierung ca. 60 Mal pro Sekunde
     } else if (barSide === 'right') {
         if (rightInterval) clearInterval(rightInterval);
         rightInterval = setInterval(function() {
-            gameState.bar.rightY += direction * barSpeed;
+            gameState.bar.rightY = direction * barSpeed;
             gameState.bar.rightY = Math.max(0, Math.min(gameState.canvas.height, gameState.bar.rightY));
         }, 16);
     }

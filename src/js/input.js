@@ -1,14 +1,17 @@
 // src/js/input.js
 
+/**
+ * input.js
+ * Verarbeitet die Benutzereingaben über die Schaltknüppel.
+ */
+
 import { gameState } from './gameState.js';
 import { config } from './config.js';
 import { resetGame, resetTimer } from './gameState.js';
 
 export function setupInputHandlers() {
-    setupButton('leftUp', 'left', -1);
-    setupButton('leftDown', 'left', 1);
-    setupButton('rightUp', 'right', -1);
-    setupButton('rightDown', 'right', 1);
+    setupJoystick('leftJoystick', 'left');
+    setupJoystick('rightJoystick', 'right');
 
     document.getElementById('gameResetButton').addEventListener('click', () => {
         gameState.lives = config.maxLives;
@@ -18,80 +21,154 @@ export function setupInputHandlers() {
     });
 }
 
-function setupButton(buttonId, side, direction) {
-    const button = document.getElementById(buttonId);
-    let intervalId;
+function setupJoystick(joystickId, side) {
+    const joystick = document.getElementById(joystickId);
+    const joystickContainer = joystick.parentElement;
 
-    const startMoving = () => {
-        if (gameState.gameOver || gameState.ballInHole) return;
-        adjustBar(side, direction);
-        intervalId = setInterval(() => {
-            if (gameState.gameOver || gameState.ballInHole) {
-                clearInterval(intervalId);
-                return;
+    let touchId = null; // Speichert die Touch-ID für diesen Joystick
+
+    const maxMovement = config.joystickMaxMovement; // Aus config.js
+    const deadzone = config.joystickDeadzone; // Aus config.js
+
+    const touchStart = (e) => {
+        e.preventDefault(); // Verhindert das Scrollen bei Touch-Geräten
+        for (let touch of e.changedTouches) {
+            if (touchId === null) {
+                if (touch.target === joystickContainer || joystickContainer.contains(touch.target)) {
+                    touchId = touch.identifier;
+                    handleTouchMove(touch);
+                }
             }
-            adjustBar(side, direction);
-        }, 20);
+        }
     };
 
-    const stopMoving = () => {
-        clearInterval(intervalId);
+    const touchMove = (e) => {
+        for (let touch of e.changedTouches) {
+            if (touch.identifier === touchId) {
+                handleTouchMove(touch);
+            }
+        }
     };
 
-    button.addEventListener('mousedown', startMoving);
-    button.addEventListener('mouseup', stopMoving);
-    button.addEventListener('mouseleave', stopMoving);
+    const touchEnd = (e) => {
+        for (let touch of e.changedTouches) {
+            if (touch.identifier === touchId) {
+                touchId = null;
+                resetJoystick();
+            }
+        }
+    };
 
-    // Für Touch-Geräte
-    button.addEventListener('touchstart', (e) => {
-        e.preventDefault(); // Verhindert zusätzliches Klick-Event
-        startMoving();
-    }, { passive: false });
+    function handleTouchMove(touch) {
+        const rect = joystickContainer.getBoundingClientRect();
+        const offsetY = touch.clientY - rect.top;
+        let deltaY = offsetY - rect.height / 2;
 
-    button.addEventListener('touchend', stopMoving);
-}
+        // Deadzone anwenden
+        if (Math.abs(deltaY) < deadzone) {
+            deltaY = 0;
+        } else {
+            deltaY -= Math.sign(deltaY) * deadzone; // Deadzone abziehen
+        }
 
-function adjustBar(side, direction) {
-    const moveAmount = config.baseBarSpeed * direction * 5;
+        // Begrenzen des Ausschlags
+        deltaY = Math.max(-maxMovement, Math.min(maxMovement, deltaY));
 
-    if (side === 'left') {
-        const newLeftY = Math.min(
-            gameState.canvas.height / (window.devicePixelRatio || 1) - gameState.bar.height / 2,
-            Math.max(0, gameState.bar.leftY + moveAmount)
-        );
-        gameState.bar.leftY = newLeftY;
+        // Position des Joysticks anpassen
+        joystick.style.top = `calc(50% - var(--joystick-handle-height) / 2 + ${deltaY}px)`;
 
-        // Kugelposition anpassen
-        adjustBallPosition();
-    } else if (side === 'right') {
-        const newRightY = Math.min(
-            gameState.canvas.height / (window.devicePixelRatio || 1) - gameState.bar.height / 2,
-            Math.max(0, gameState.bar.rightY + moveAmount)
-        );
-        gameState.bar.rightY = newRightY;
+        // Geschwindigkeit der Stange anpassen
+        const speed = (deltaY / maxMovement) * config.baseBarSpeed * config.joystickSensitivity;
 
-        // Kugelposition anpassen
-        adjustBallPosition();
+        if (side === 'left') {
+            gameState.bar.leftYSpeed = speed;
+        } else if (side === 'right') {
+            gameState.bar.rightYSpeed = speed;
+        }
+    }
+
+    function resetJoystick() {
+        // Joystick zurück zur Ausgangsposition animieren
+        joystick.style.transition = 'top 0.3s ease-out';
+        joystick.style.top = 'calc(50% - var(--joystick-handle-height) / 2)';
+
+        // Geschwindigkeit der Stange auf Null setzen
+        if (side === 'left') {
+            gameState.bar.leftYSpeed = 0;
+        } else if (side === 'right') {
+            gameState.bar.rightYSpeed = 0;
+        }
+
+        setTimeout(() => {
+            joystick.style.transition = '';
+        }, 300);
+    }
+
+    // Event Listener für Touch-Geräte
+    joystickContainer.addEventListener('touchstart', touchStart, { passive: false });
+    joystickContainer.addEventListener('touchmove', touchMove, { passive: false });
+    joystickContainer.addEventListener('touchend', touchEnd);
+
+    // Event Listener für Maus (für Tests am PC)
+    joystickContainer.addEventListener('mousedown', (e) => {
+        e.preventDefault(); // Verhindert Textauswahl
+        if (touchId === null) {
+            touchId = 'mouse'; // Verwende 'mouse' als ID
+            handleMouseMove(e);
+            window.addEventListener('mousemove', handleMouseMove);
+            window.addEventListener('mouseup', mouseUp);
+        }
+    });
+
+    function handleMouseMove(e) {
+        if (touchId !== 'mouse') return;
+        const rect = joystickContainer.getBoundingClientRect();
+        const offsetY = e.clientY - rect.top;
+        let deltaY = offsetY - rect.height / 2;
+
+        // Deadzone anwenden
+        if (Math.abs(deltaY) < deadzone) {
+            deltaY = 0;
+        } else {
+            deltaY -= Math.sign(deltaY) * deadzone;
+        }
+
+        // Begrenzen des Ausschlags
+        deltaY = Math.max(-maxMovement, Math.min(maxMovement, deltaY));
+
+        // Position des Joysticks anpassen
+        joystick.style.top = `calc(50% - var(--joystick-handle-height) / 2 + ${deltaY}px)`;
+
+        // Geschwindigkeit der Stange anpassen
+        const speed = (deltaY / maxMovement) * config.baseBarSpeed * config.joystickSensitivity;
+
+        if (side === 'left') {
+            gameState.bar.leftYSpeed = speed;
+        } else if (side === 'right') {
+            gameState.bar.rightYSpeed = speed;
+        }
+    }
+
+    function mouseUp() {
+        if (touchId !== 'mouse') return;
+        touchId = null;
+        resetJoystick();
+        window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('mouseup', mouseUp);
     }
 }
 
-function adjustBallPosition() {
-    const adjustedWidth = gameState.canvas.width / (window.devicePixelRatio || 1);
-    const barSlope = (gameState.bar.rightY - gameState.bar.leftY) / adjustedWidth;
-    const barYAtBallX = gameState.bar.leftY + barSlope * gameState.ball.x;
+/**
+ * Funktion zum Aktualisieren der Stangenpositionen.
+ */
+export function updateBars() {
+    const adjustedHeight = gameState.canvas.height / (window.devicePixelRatio || 1);
 
-    const isOnBar = (
-        gameState.ball.y + gameState.ball.radius >= barYAtBallX - gameState.bar.height / 2 - 0.5 &&
-        gameState.ball.y + gameState.ball.radius <= barYAtBallX + gameState.bar.height / 2 + 0.5 &&
-        gameState.ball.x >= 0 &&
-        gameState.ball.x <= adjustedWidth
-    );
+    // Linke Stange bewegen
+    gameState.bar.leftY += gameState.bar.leftYSpeed;
+    gameState.bar.leftY = Math.max(0, Math.min(adjustedHeight, gameState.bar.leftY));
 
-    if (isOnBar) {
-        // Kugelposition entsprechend der Bewegung der Stange anpassen
-        gameState.ball.y = barYAtBallX - gameState.ball.radius - gameState.bar.height / 2;
-
-        // Vertikale Geschwindigkeit der Kugel auf 0 setzen
-        gameState.ball.speedY = 0;
-    }
+    // Rechte Stange bewegen
+    gameState.bar.rightY += gameState.bar.rightYSpeed;
+    gameState.bar.rightY = Math.max(0, Math.min(adjustedHeight, gameState.bar.rightY));
 }

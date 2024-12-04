@@ -3,45 +3,78 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+    <!-- Meta-Angaben für Zeichensatz und Titel -->
     <meta charset="UTF-8">
     <title>Ice Cold Beer 🍺</title>
+    <!-- Responsives Design für mobile Geräte -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Einbindung der CSS-Datei -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
+    <!-- Spielmodus-Auswahl -->
+    <div id="modeSelectionScreen">
         <h1>Ice Cold Beer 🍺</h1>
+        <h2>Wähle den Spielmodus:</h2>
+        <button id="normalModeButton">Normal</button>
+        <button id="expertModeButton">Experte</button>
+        <button id="viewHighscoresButton">Highscores ansehen</button>
+    </div>
+
+    <!-- Kopfbereich der Seite -->
+    <header style="display: none;">
+        <h1>Ice Cold Beer 🍺</h1>
+        <!-- Zurück-Button -->
+        <button id="backToModeSelectionButton">⬅️</button>
     </header>
 
     <!-- Spielcontainer -->
-    <div class="game-container">
+    <div class="game-container" style="display: none;">
+        <!-- Canvas-Element für das Spiel -->
         <canvas id="gameCanvas"></canvas>
     </div>
 
     <!-- Spielinformationen -->
-    <div class="game-info">
+    <div class="game-info" style="display: none;">
+        <!-- Anzeige der Leben -->
         <div id="lives">Leben: ❤️❤️❤️</div>
+        <!-- Anzeige des aktuellen Modus -->
+        <div id="currentMode">Modus: 😀</div>
+        <!-- Anzeige des aktuellen Ziels -->
         <div id="currentHole">Ziel: Loch 1</div>
     </div>
 
     <!-- Steuerungselemente -->
-    <div class="controls">
-        <div class="side-buttons">
-            <button id="leftUp">⬆️</button>
-            <button id="leftDown">⬇️</button>
+    <div class="controls" style="display: none;">
+        <!-- Linker Schaltknüppel -->
+        <div class="joystick-container" id="leftJoystickContainer">
+            <div class="joystick" id="leftJoystick">
+                <!-- Griff des Schaltknüppels -->
+                <div class="joystick-handle">
+                    <!-- Doppelpfeil-Emoji -->
+                    <span class="joystick-icon">↕️</span>
+                </div>
+            </div>
         </div>
+        <!-- Zentrale Steuerungselemente -->
         <div class="center-controls">
+            <!-- Timer-Anzeige -->
             <div id="timer">Zeit: 00:00</div>
+            <!-- Spiel zurücksetzen Button -->
             <button id="gameResetButton">🔄</button>
         </div>
-        <div class="side-buttons">
-            <button id="rightUp">⬆️</button>
-            <button id="rightDown">⬇️</button>
+        <!-- Rechter Schaltknüppel -->
+        <div class="joystick-container" id="rightJoystickContainer">
+            <div class="joystick" id="rightJoystick">
+                <div class="joystick-handle">
+                    <span class="joystick-icon">↕️</span>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Endbildschirm -->
-    <div id="endScreen">
+    <div id="endScreen" style="display: none;">
         <div id="endMessage"></div>
         <!-- Highscore-Eingabe -->
         <div id="highScoreInput" style="display: none;">
@@ -51,8 +84,13 @@
         </div>
         <!-- Highscore-Liste -->
         <div id="highScoreList">
-            <h2>Highscores</h2>
+            <h2 id="highScoreTitle">Highscores - Normal 😀</h2>
             <ol id="highScores"></ol>
+            <!-- Swipe-Buttons in der swipeHint-Anzeige platzieren -->
+            <p id="swipeHint">
+                <button id="swipeLeftButton" class="swipe-button">⇐</button>
+                <button id="swipeRightButton" class="swipe-button">⇒</button>
+            </p>
         </div>
         <!-- Neues Spiel Button -->
         <button id="restartButton">Neues Spiel 🔄</button>
@@ -60,7 +98,7 @@
         <button id="resetHighscoresButton">Highscores zurücksetzen</button>
     </div>
 
-    <!-- Skripte laden -->
+    <!-- Einbindung der JavaScript-Datei -->
     <script type="module" src="src/js/main.js"></script>
 </body>
 </html>

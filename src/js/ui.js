@@ -24,6 +24,7 @@ export function updateDisplay() {
     const livesDisplay = document.getElementById('lives');
     const currentHoleDisplay = document.getElementById('currentHole');
     const timerDisplay = document.getElementById('timer');
+    const currentModeDisplay = document.getElementById('currentMode'); // Neue Variable
 
     // Leben als Herz-Emojis anzeigen
     let hearts = '';
@@ -32,8 +33,17 @@ export function updateDisplay() {
     }
     livesDisplay.textContent = 'Leben: ' + hearts;
 
+    // Aktuelles Modus anzeigen mit Emoji
+    let modeEmoji = '';
+    if (gameState.mode === 'expert') {
+        modeEmoji = '💀'; // Totenkopf für Experte
+    } else {
+        modeEmoji = '😀'; // Lächelndes Gesicht für Normal
+    }
+    currentModeDisplay.textContent = `Modus: ${modeEmoji}`; // Nur "Modus: " und Emoji
+
     // Aktuelles Ziel anzeigen
-    currentHoleDisplay.textContent = 'Aktuelles Ziel: Loch ' + gameState.currentTarget;
+    currentHoleDisplay.textContent = 'Ziel: Loch ' + gameState.currentTarget;
 
     // Timer aktualisieren
     const minutes = Math.floor(gameState.elapsedTime / 60).toString().padStart(2, '0');
@@ -54,7 +64,9 @@ export function showTemporaryMessage(message, duration, callback) {
     document.body.appendChild(messageOverlay);
 
     setTimeout(() => {
-        document.body.removeChild(messageOverlay);
+        if (document.body.contains(messageOverlay)) {
+            document.body.removeChild(messageOverlay);
+        }
         if (callback) callback();
     }, duration);
 }

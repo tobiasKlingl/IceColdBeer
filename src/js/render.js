@@ -20,7 +20,7 @@ export function draw() {
     gameState.holes.forEach(hole => {
         // Lochfarbe bestimmen
         let holeColor;
-        const holeTypeNum = parseInt(hole.Type);
+        const holeTypeNum = parseInt(hole.Type, 10);
 
         if (holeTypeNum === gameState.currentTarget) {
             holeColor = config.colors.currentTargetHoleColor;
@@ -55,7 +55,7 @@ export function draw() {
             gameState.ctx.fillText(
                 holeTypeNum,
                 hole.actualX,
-                hole.actualY - hole.actualRadius - 3.5*config.holeBorderWidth
+                hole.actualY - hole.actualRadius - 3.5 * config.holeBorderWidth
             );
         }
     });
@@ -80,5 +80,5 @@ export function draw() {
     applyPhysics();
 
     // Nächsten Frame anfordern
-    requestAnimationFrame(draw);
+    gameState.animationFrameId = requestAnimationFrame(draw);
 }

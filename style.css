@@ -1,22 +1,77 @@
 /* style.css */
 
-/* Standardwerte für CSS-Variablen */
+/* CSS-Variablen */
 :root {
-    --header-height: 6vh;
-    --header-opacity: 0.8;
-    --element-opacity: 0.7;
-    --button-size: 10.4vh; /* Angepasst auf 10.4vh */
-    --restart-button-size: 16vh;
-    --button-font-size: 4.5vh;
+    /* Höhe des Headers */
+    --header-height: var(--config-header-height);
+    /* Transparenz des Headers */
+    --header-opacity: var(--config-header-opacity);
+    /* Transparenz allgemeiner Elemente */
+    --element-opacity: var(--config-element-opacity);
+    /* Größe der Buttons */
+    --button-size: var(--config-button-size);
+    /* Größe des Reset-Buttons */
+    --restart-button-size: var(--config-restart-button-size);
+    /* Schriftgröße der Buttons */
+    --button-font-size: var(--config-button-font-size);
+    /* Breite des Spielfeldrandes */
     --playfield-border-width: var(--config-playfield-border-width);
+    /* Farbe des Spielfeldrandes */
     --playfield-border-color: var(--config-playfield-border-color);
+    /* Hintergrundfarbe des Headers */
     --header-background-color: var(--config-header-background-color);
+    /* Farbe der Buttons */
     --button-color: var(--config-button-color);
+    /* Hover-Farbe der Buttons */
     --button-hover-color: var(--config-button-hover-color);
-    --playfield-top-margin: var(--playfield-top-margin);
-    --playfield-bottom-margin: var(--playfield-bottom-margin);
-    --controls-bottom-margin: var(--controls-bottom-margin);
-    --arrow-button-margin: 5px; /* Standardwert, kann angepasst werden */
+    /* Abstände für das Spielfeld */
+    --playfield-top-margin: var(--config-playfield-top-margin);
+    --playfield-bottom-margin: var(--config-playfield-bottom-margin);
+    /* Abstand unter den Steuerungselementen */
+    --controls-bottom-margin: var(--config-controls-bottom-margin);
+    /* Joystick-Größe */
+    --joystick-size: var(--config-joystick-size);
+    --joystick-handle-height: var(--config-joystick-handle-height);
+}
+
+/* Modus-Auswahlbildschirm */
+#modeSelectionScreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--header-background-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#modeSelectionScreen h1 {
+    font-size: 4vh;
+    margin-bottom: 20px;
+}
+
+#modeSelectionScreen h2 {
+    font-size: 3vh;
+    margin-bottom: 20px;
+}
+
+#modeSelectionScreen button {
+    padding: 15px 30px;
+    margin: 10px;
+    font-size: 3vh;
+    background-color: var(--button-color);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#modeSelectionScreen button:hover {
+    background-color: var(--button-hover-color);
 }
 
 body, html {
@@ -26,12 +81,13 @@ body, html {
     height: 100%;
     overflow: hidden;
     font-family: Arial, sans-serif;
+    /* Hintergrundbild */
     background-image: url('assets/retro_background.png');
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
     padding-bottom: env(safe-area-inset-bottom);
-    font-weight: bold; /* Alle Texte fett darstellen */
+    font-weight: bold; /* Fettgedruckte Texte */
 }
 
 header {
@@ -40,6 +96,10 @@ header {
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     height: var(--header-height);
     line-height: var(--header-height);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
 }
 
 header h1 {
@@ -48,9 +108,19 @@ header h1 {
     color: #333;
 }
 
+#backToModeSelectionButton {
+    position: absolute;
+    left: 10px;
+    background: none;
+    border: none;
+    font-size: 4vh;
+    cursor: pointer;
+}
+
 .game-container {
     position: relative;
-    max-width: 95%;
+    width: 95%;
+    max-width: 480px; /* Maximale Breite für Desktop-Browser */
     margin: var(--playfield-top-margin) auto var(--playfield-bottom-margin);
     background-color: rgba(255, 255, 255, var(--element-opacity));
     border-radius: 10px;
@@ -144,9 +214,10 @@ header h1 {
     display: flex;
     align-items: center;
     font-size: 2vh;
-    margin: 0 10px; /* Abstand zu den Rändern */
+    margin: 0 10px;
 }
 
+/* Steuerungselemente */
 .controls {
     display: flex;
     justify-content: space-between;
@@ -154,33 +225,52 @@ header h1 {
     padding: 5px;
     padding-bottom: calc(20px + env(safe-area-inset-bottom));
     margin-bottom: var(--controls-bottom-margin);
+    background-color: var(--header-background-color);
 }
 
-.side-buttons, .center-controls {
+.joystick-container {
+    position: relative;
+    width: var(--joystick-size);
+    height: calc(var(--joystick-size) * 2);
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
+    overflow: hidden;
+    touch-action: none;
+    flex-shrink: 0;
+}
+
+.joystick {
+    position: absolute;
+    bottom: calc(50% - var(--joystick-handle-height) / 2);
+    left: 0;
+    width: 100%;
+    height: var(--joystick-handle-height);
+    background-color: var(--button-color);
+    border-radius: 20px;
+    transition: bottom 0.1s ease-out;
+}
+
+.joystick-handle {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 100%;
+    background-color: var(--button-hover-color);
+    border-radius: 20px;
     display: flex;
-    flex-direction: column;
     align-items: center;
+    justify-content: center;
+}
+
+.joystick-icon {
+    font-size: 4vh;
 }
 
 #timer {
     margin-bottom: 5px;
     font-size: 2vh;
-}
-
-.side-buttons > button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: var(--arrow-button-margin);
-    width: var(--button-size);
-    height: var(--button-size);
-    background-color: var(--button-color);
-    color: white;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: var(--button-font-size);
-    transition: background-color 0.3s ease;
 }
 
 .center-controls > button#gameResetButton {
@@ -191,7 +281,8 @@ header h1 {
     border: none;
     border-radius: 50%;
     cursor: pointer;
-    font-size: 2.5vh;
+    font-size: 8vh;
+    line-height: var(--restart-button-size);
     transition: background-color 0.3s ease;
     display: flex;
     align-items: center;
@@ -199,50 +290,47 @@ header h1 {
     margin: 0;
 }
 
-.side-buttons > button:hover, .center-controls > button:hover {
-    background-color: var(--button-hover-color);
-}
-
-#highScores {
-    list-style: none;
-    padding: 0;
-}
-
-#highScores > li {
-    margin: 5px 0;
+/* Swipe-Buttons innerhalb der swipeHint-Anzeige */
+#swipeHint {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
     font-size: 2vh;
+    text-align: center;
+    margin-top: 10px;
 }
 
+.swipe-button {
+    padding: 5px 10px;
+    font-size: 2vh;
+    cursor: pointer;
+    background-color: #444;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.swipe-button:hover {
+    background-color: #666;
+}
+
+/* Pop-up Meldungen */
 .message-overlay {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.85);
     color: #fff;
     padding: 20px 30px;
     border-radius: 10px;
     font-size: 2.5vh;
     text-align: center;
-    z-index: 1000;
+    z-index: 1001;
+    max-width: 80%;
+    word-wrap: break-word;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
-.showing-end-screen .controls,
-.showing-end-screen .game-info,
-.showing-end-screen .game-container {
-    filter: blur(5px);
-}
-
-@media (max-width: 768px) {
-    header h1 {
-        font-size: 2.5vh;
-    }
-
-    .game-info > div, #highScores > li {
-        font-size: 2vh;
-    }
-
-    .center-controls > button#gameResetButton {
-        font-size: 2vh;
-    }
-}

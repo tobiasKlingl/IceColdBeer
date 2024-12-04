@@ -6,18 +6,18 @@
  */
 
 export const config = {
-    // Canvas-Einstellungen
+    // Prozentsatz der Höhe, den das Canvas einnimmt
     canvasHeightPercentage: 0.6,
 
     // Header-Einstellungen
     headerHeight: '6vh',
     headerBackgroundOpacity: 0.8,
 
-    // Margins für Spielfeld
+    // Abstände für das Spielfeld
     playfieldTopMargin: '1vh',
     playfieldBottomMargin: '1vh',
 
-    // Element-Transparenzeinstellungen
+    // Transparenzeinstellungen für Elemente
     elementBackgroundOpacity: 0.7,
 
     // Ball-Eigenschaften
@@ -27,17 +27,17 @@ export const config = {
     // Stangen-Eigenschaften
     barHeight: 5,
     barColor: 'rgba(255, 165, 0, 0.8)',
-    baseBarSpeed: 0.1, // Reduziert von 1.5 auf 0.5
+    baseBarSpeed: 0.1,
 
     barStartYPercentage: 0.95,
 
     // Physikparameter
     gravity: 0.5,
-    friction: 0.99,
-    staticFrictionThreshold: 0.01, // Schwellenwert für die Haftreibung
+    friction: 0.98,
+    staticFrictionThreshold: 0.0,
 
-    // Wanddämpfung
-    wallBounceDamping: 0.66, // Zwischen 0 und 1
+    // Dämpfung bei Kollision mit Wänden
+    wallBounceDamping: 0.5, // Zwischen 0 und 1
 
     // Loch-Einstellungen
     holeOverlapThreshold: 0.85,
@@ -66,10 +66,10 @@ export const config = {
     showNumbersOnMissHoles: false,
 
     // Button-Einstellungen
-    buttonSize: '10.4vh', // Angepasst
+    buttonSize: '10.4vh', // Größe der Buttons
     buttonFontSize: '4.5vh',
     restartButtonSize: '16vh',
-    arrowButtonMargin: '5px', // Standardwert
+    arrowButtonMargin: '5px', // Margin für Buttons
 
     // Timer-Einstellungen
     timerUpdateInterval: 1000,
@@ -77,9 +77,30 @@ export const config = {
     // Gesamtanzahl der Level
     totalLevels: 10,
 
-    // Margin unter den Steuerungsbuttons
+    // Margin unter den Steuerungselementen
     controlsBottomMargin: '2vh',
 
     // Delta-Y für Lochverschiebung (Bruchteil der Canvas-Höhe)
     deltaYFraction: 0.06,
+
+    // Joystick-Einstellungen
+    joystickSize: '11.5vh',
+    joystickHandleHeight: '40%',
+    joystickMaxMovement: 51,
+    joystickSensitivity: 3,
+    joystickDeadzone: 4,
+
+    // Expert Mode Einstellungen
+    expertModeHoleMovementRadiusTarget: 15,
+    expertModeHoleMovementSpeedTarget: 0.3,
+    expertModeHoleMovementRadiusMiss: 7.5,
+    expertModeHoleMovementSpeedMiss: 0.15,
+    expertModeHoleDirectionChangeInterval: 1000, // Intervall für Richtungsänderung in Millisekunden
+    expertModeHoleDirectionAngleRange: 30,      // Winkelbereich für Richtungsänderung in Grad
+
+    // Highscore Tabellen
+    highscoreSheetNames: {
+        normal: 'normal',
+        expert: 'expert'
+    },
 };

@@ -1,10 +1,17 @@
 // src/js/physics.js
 
+/**
+ * physics.js
+ * Enthält die Physikberechnungen für das Spiel.
+ */
+
 import { gameState } from './gameState.js';
 import { config } from './config.js';
 import { showEndScreen } from './highscore.js';
 import { resetGame } from './gameState.js';
 import { updateDisplay, showTemporaryMessage } from './ui.js';
+import { updateBars } from './input.js';
+import { stopHoleMovement } from './holeMovement.js';
 
 export function applyPhysics() {
     if (gameState.gameOver || gameState.ballInHole) {
@@ -13,6 +20,10 @@ export function applyPhysics() {
 
     const adjustedWidth = gameState.canvas.width / (window.devicePixelRatio || 1);
     const adjustedHeight = gameState.canvas.height / (window.devicePixelRatio || 1);
+
+    // Aktualisiere die Position der Stangen basierend auf der Eingabe
+    updateBars();
+
     const barSlope = (gameState.bar.rightY - gameState.bar.leftY) / adjustedWidth;
     const angle = Math.atan(barSlope); // Neigungswinkel der Stange
 
@@ -34,7 +45,7 @@ export function applyPhysics() {
         // Schwerkraftkomponente entlang der Stange
         const gravityAlongBar = config.gravity * Math.sin(angle);
 
-        if (Math.abs(gameState.ball.speedX) < 0.01 && Math.abs(gravityAlongBar) < config.staticFrictionThreshold) {
+        if (Math.abs(gameState.ball.speedX) < config.staticFrictionThreshold && Math.abs(gravityAlongBar) < config.staticFrictionThreshold) {
             // Kugel ruht aufgrund der Haftreibung
             gameState.ball.speedX = 0;
         } else {
@@ -67,7 +78,7 @@ export function applyPhysics() {
         const dy = gameState.ball.y - hole.actualY;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
-        if (distance + gameState.ball.radius*config.holeOverlapThreshold <= hole.actualRadius) {
+        if (distance + gameState.ball.radius * config.holeOverlapThreshold <= hole.actualRadius) {
             handleHoleCollision(hole);
             return; // Funktion verlassen
         }
@@ -80,48 +91,78 @@ export function applyPhysics() {
     }
 }
 
+/**
+ * Funktion zur Handhabung von Kollisionen mit Löchern.
+ * @param {Object} hole - Das Loch, mit dem kollidiert wurde.
+ */
 function handleHoleCollision(hole) {
     gameState.ballInHole = true;
-    const holeTypeNum = parseInt(hole.Type);
+    const holeTypeNum = parseInt(hole.Type, 10);
 
     if (holeTypeNum === gameState.currentTarget) {
         // Richtiges Loch
         handleCorrectHole();
     } else if (holeTypeNum >= 1 && holeTypeNum <= config.totalLevels) {
         // Falsches Ziel-Loch
-        handleIncorrectHole(); // Hier Leben abziehen
+        handleIncorrectHole();
     } else {
         // Verlustloch
         handleLossHole();
     }
 }
 
+/**
+ * Funktion zur Handhabung des richtigen Lochs.
+ */
 function handleCorrectHole() {
     const messages = [
         '🎉 Fantastisch! Loch ' + gameState.currentTarget + ' getroffen!',
         '🏅 Hervorragend! Weiter zum nächsten Loch!',
         '✨ Super Schuss! Auf zu Loch ' + (gameState.currentTarget + 1) + '!',
     ];
+
+    // Lochbewegung stoppen
+    if (gameState.mode === 'expert') {
+        stopHoleMovement();
+    }
+
     const message = messages[Math.floor(Math.random() * messages.length)];
-    showTemporaryMessage(message, 2000, () => {
+    showTemporaryMessage(message, 1500, () => {
         gameState.currentTarget++;
         if (gameState.currentTarget > config.totalLevels) {
             // Spiel gewonnen
             gameState.gameOver = true;
-            showEndScreen(true);
+            updateDisplay();
+            showEndScreen(true); // 'true' bedeutet, dass das Spiel gewonnen wurde
         } else {
             resetGame();
             updateDisplay();
+            // Endbildschirm ausblenden
+            document.getElementById('endScreen').style.display = 'none';
+            // Spiel-Elemente anzeigen
+            document.querySelector('header').style.display = 'flex';
+            document.querySelector('.game-container').style.display = 'block';
+            document.querySelector('.game-info').style.display = 'flex';
+            document.querySelector('.controls').style.display = 'flex';
         }
     });
 }
 
+/**
+ * Funktion zur Handhabung eines falschen Lochs.
+ */
 function handleIncorrectHole() {
     gameState.lives = Math.max(0, gameState.lives - 1); // Leben abziehen
     const messages = [
         '❌ Falsches Loch! Ein Leben verloren.',
         '😓 Das war das falsche Loch. Noch ' + gameState.lives + ' Leben übrig.',
     ];
+
+    // Lochbewegung stoppen
+    if (gameState.mode === 'expert') {
+        stopHoleMovement();
+    }
+
     const message = messages[Math.floor(Math.random() * messages.length)];
     if (gameState.lives <= 0) {
         gameState.gameOver = true;
@@ -131,16 +172,32 @@ function handleIncorrectHole() {
         showTemporaryMessage(message, 2000, () => {
             resetGame();
             updateDisplay();
+            // Endbildschirm ausblenden
+            document.getElementById('endScreen').style.display = 'none';
+            // Spiel-Elemente anzeigen
+            document.querySelector('header').style.display = 'flex';
+            document.querySelector('.game-container').style.display = 'block';
+            document.querySelector('.game-info').style.display = 'flex';
+            document.querySelector('.controls').style.display = 'flex';
         });
     }
 }
 
+/**
+ * Funktion zur Handhabung eines Verlustlochs.
+ */
 function handleLossHole() {
     gameState.lives = Math.max(0, gameState.lives - 1);
     const messages = [
         '💥 Autsch! Ein Leben verloren!',
         '☠️ Vorsicht! Noch ' + gameState.lives + ' Leben übrig.',
     ];
+
+    // Lochbewegung stoppen
+    if (gameState.mode === 'expert') {
+        stopHoleMovement();
+    }
+
     const message = messages[Math.floor(Math.random() * messages.length)];
     if (gameState.lives <= 0) {
         gameState.gameOver = true;
@@ -154,6 +211,9 @@ function handleLossHole() {
     }
 }
 
+/**
+ * Funktion zur Handhabung des Balls, der aus dem Bildschirm fällt.
+ */
 function handleBallOutOfBounds() {
     gameState.ballInHole = true;
     gameState.lives = Math.max(0, gameState.lives - 1);
