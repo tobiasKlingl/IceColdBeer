@@ -1,36 +1,30 @@
+<!-- index.html -->
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Ice Cold Beer</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ice Cold Beer 🍺</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <header>
+        <h1>Ice Cold Beer 🍺</h1>
+    </header>
+
+    <!-- Spielcontainer -->
     <div class="game-container">
         <canvas id="gameCanvas"></canvas>
-        <!-- Endbildschirm -->
-        <div id="endScreen">
-            <div id="endMessage"></div>
-            <!-- Highscore-Eingabe -->
-            <div id="highScoreInput" style="display: none;">
-                <label for="playerName">Name eingeben:</label>
-                <input type="text" id="playerName" maxlength="10">
-                <button id="submitScoreButton">Bestätigen</button>
-            </div>
-            <!-- Highscore-Liste -->
-            <div id="highScoreList">
-                <h2>Highscores</h2>
-                <ol id="highScores"></ol>
-            </div>
-            <button id="restartButton">Neustart</button>
-        </div>
     </div>
-    <!-- Anzeigen 'Leben' und 'Aktuelles Ziel' in einer Zeile -->
+
+    <!-- Spielinformationen -->
     <div class="game-info">
         <div id="lives">Leben: ❤️❤️❤️</div>
-        <div id="currentHole">Aktuelles Ziel: Loch 1</div>
+        <div id="currentHole">Ziel: Loch 1</div>
     </div>
+
+    <!-- Steuerungselemente -->
     <div class="controls">
         <div class="side-buttons">
             <button id="leftUp">⬆️</button>
@@ -38,15 +32,35 @@
         </div>
         <div class="center-controls">
             <div id="timer">Zeit: 00:00</div>
-            <!-- Neustart-Button -->
-            <button id="gameResetButton">🔄 Neustart</button>
+            <button id="gameResetButton">🔄</button>
         </div>
         <div class="side-buttons">
             <button id="rightUp">⬆️</button>
             <button id="rightDown">⬇️</button>
         </div>
     </div>
-    <script src="config.js"></script>
-    <script src="game.js"></script>
+
+    <!-- Endbildschirm -->
+    <div id="endScreen">
+        <div id="endMessage"></div>
+        <!-- Highscore-Eingabe -->
+        <div id="highScoreInput" style="display: none;">
+            <label for="playerName">Name eingeben:</label>
+            <input type="text" id="playerName" maxlength="10">
+            <button id="submitScoreButton">Bestätigen</button>
+        </div>
+        <!-- Highscore-Liste -->
+        <div id="highScoreList">
+            <h2>Highscores</h2>
+            <ol id="highScores"></ol>
+        </div>
+        <!-- Neues Spiel Button -->
+        <button id="restartButton">Neues Spiel 🔄</button>
+        <!-- Highscores zurücksetzen Button -->
+        <button id="resetHighscoresButton">Highscores zurücksetzen</button>
+    </div>
+
+    <!-- Skripte laden -->
+    <script type="module" src="src/js/main.js"></script>
 </body>
 </html>
