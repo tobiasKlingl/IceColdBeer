@@ -1,0 +1,8 @@
+# Setze Standardzeilenendungen auf LF
+* text=auto eol=lf
+
+# Spezifische Dateitypen (optional)
+*.json text eol=lf
+*.js text eol=lf
+*.css text eol=lf
+*.html text eol=lf

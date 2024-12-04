@@ -6,9 +6,9 @@
  * Importiert und initialisiert alle notwendigen Module.
  */
 
-import { initializeGame, gameState } from './gameState.js';
-import { setCSSVariables } from './utils.js';
 import { showEndScreen } from './highscore.js';
+import { initializeGame, gameState, resetGame} from './gameState.js';
+import { setCSSVariables } from './utils.js';
 
 /**
  * Funktion zum Starten des Spiels.
@@ -23,7 +23,11 @@ function startGame() {
     document.querySelector('.game-info').style.display = 'flex';
     document.querySelector('.controls').style.display = 'flex';
 
+    // Initialize game
     initializeGame();
+
+    // Start game loop or other game logic
+    // Hier kannst du deine Spiel-Logik starten
 }
 
 // Sobald das Fenster vollständig geladen ist, initialisiere das Spiel
@@ -36,28 +40,30 @@ window.onload = function() {
     const viewHighscoresButton = document.getElementById('viewHighscoresButton');
     const backToModeSelectionButton = document.getElementById('backToModeSelectionButton');
 
-    normalModeButton.addEventListener('click', () => {
-        gameState.mode = 'normal';
-        gameState.viewMode = 'normal'; // Setze viewMode auf 'normal'
-        startGame();
-    });
+    if (normalModeButton && expertModeButton && viewHighscoresButton && backToModeSelectionButton) {
+        normalModeButton.addEventListener('click', () => {
+            gameState.mode = 'normal';
+            gameState.viewMode = 'normal'; // Setze viewMode auf 'normal'
+            startGame();
+        });
 
-    expertModeButton.addEventListener('click', () => {
-        gameState.mode = 'expert';
-        gameState.viewMode = 'expert'; // Setze viewMode auf 'expert'
-        startGame();
-    });
+        expertModeButton.addEventListener('click', () => {
+            gameState.mode = 'expert';
+            gameState.viewMode = 'expert'; // Setze viewMode auf 'expert'
+            startGame();
+        });
 
-    viewHighscoresButton.addEventListener('click', () => {
-        // Setze viewMode auf 'normal' als Standard, falls nicht bereits gesetzt
-        if (!['normal', 'expert'].includes(gameState.viewMode)) {
-            gameState.viewMode = 'normal';
-        }
-        showEndScreen(false, true); // Zeige Highscore-Bildschirm ohne Spielende
-    });
+        viewHighscoresButton.addEventListener('click', () => {
+            // Setze viewMode auf 'normal' als Standard, falls nicht bereits gesetzt
+            if (!['normal', 'expert'].includes(gameState.viewMode)) {
+                gameState.viewMode = 'normal';
+            }
+            showEndScreen(false, true); // Zeige Highscore-Bildschirm ohne Spielende
+        });
 
-    backToModeSelectionButton.addEventListener('click', () => {
-        // Zurück zur Modus-Auswahl
-        location.reload(); // Seite neu laden
-    });
+        backToModeSelectionButton.addEventListener('click', () => {
+            // Zurück zur Modus-Auswahl
+            location.reload(); // Seite neu laden
+        });
+    }
 };

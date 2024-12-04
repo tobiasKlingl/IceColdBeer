@@ -1,0 +1,17 @@
+{
+  "name": "icecoldbeer",
+  "version": "1.0.0",
+  "description": "Highscore management for Ice Cold Beer game",
+  "main": "src/js/main.js",
+  "scripts": {
+    "start": "live-server --host=0.0.0.0 --port=8080",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["game", "highscore", "firebase"],
+  "author": "Dein Name",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "live-server": "^1.2.1"
+  }
+}

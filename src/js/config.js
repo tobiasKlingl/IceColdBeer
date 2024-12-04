@@ -33,11 +33,11 @@ export const config = {
 
     // Physikparameter
     gravity: 0.5,
-    friction: 0.98,
+    friction: 0.99,
     staticFrictionThreshold: 0.0,
 
     // Dämpfung bei Kollision mit Wänden
-    wallBounceDamping: 0.5, // Zwischen 0 und 1
+    wallBounceDamping: 0.66, // Zwischen 0 und 1
 
     // Loch-Einstellungen
     holeOverlapThreshold: 0.85,
@@ -91,12 +91,12 @@ export const config = {
     joystickDeadzone: 4,
 
     // Expert Mode Einstellungen
-    expertModeHoleMovementRadiusTarget: 15,
+    expertModeHoleMovementRadiusTarget: 10,
     expertModeHoleMovementSpeedTarget: 0.3,
-    expertModeHoleMovementRadiusMiss: 7.5,
+    expertModeHoleMovementRadiusMiss: 5,
     expertModeHoleMovementSpeedMiss: 0.15,
     expertModeHoleDirectionChangeInterval: 1000, // Intervall für Richtungsänderung in Millisekunden
-    expertModeHoleDirectionAngleRange: 30,      // Winkelbereich für Richtungsänderung in Grad
+    expertModeHoleDirectionAngleRange: 20,      // Winkelbereich für Richtungsänderung in Grad
 
     // Highscore Tabellen
     highscoreSheetNames: {
