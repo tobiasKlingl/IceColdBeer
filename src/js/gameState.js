@@ -110,7 +110,7 @@ function initializeBarAndBall() {
     // Kugel initialisieren
     gameState.ball.radius = config.ballRadius;
     gameState.ball.color = config.ballColor;
-    gameState.ball.x = adjustedWidth * 0.9; // Startet bei 90% der Breite
+    gameState.ball.x = adjustedWidth * config.ballStartXFraction; // Startet bei 85% der Breite
     gameState.ball.y = gameState.bar.leftY - gameState.ball.radius - gameState.bar.height / 2;
     gameState.ball.speedX = 0;
     gameState.ball.speedY = 0;

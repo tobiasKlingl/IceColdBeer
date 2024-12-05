@@ -21,27 +21,28 @@ export const config = {
     elementBackgroundOpacity: 0.7,
 
     // Ball-Eigenschaften
-    ballRadius: 7,
+    ballRadius: 9,
+    ballStartXFraction: 0.85,
     ballColor: '#444444',
 
     // Stangen-Eigenschaften
     barHeight: 5,
     barColor: 'rgba(255, 165, 0, 0.8)',
-    baseBarSpeed: 0.1,
+    baseBarSpeed: 1,
 
     barStartYPercentage: 0.95,
 
     // Physikparameter
-    gravity: 0.5,
+    gravity: 1,
     friction: 0.99,
-    staticFrictionThreshold: 0.0,
+    staticFrictionThreshold: 0.001,
 
     // Dämpfung bei Kollision mit Wänden
     wallBounceDamping: 0.66, // Zwischen 0 und 1
 
     // Loch-Einstellungen
-    holeOverlapThreshold: 0.85,
-    holeBorderWidth: 2,
+    holeOverlapThreshold: 0.8,
+    holeBorderWidth: 2.5,
     colors: {
         currentTargetHoleColor: 'rgba(255, 255, 0, 0.8)',
         otherTargetHoleColor: 'rgba(0, 255, 0, 0.8)',
@@ -63,7 +64,7 @@ export const config = {
     maxLives: 3,
 
     // Anzeigeeinstellungen
-    showNumbersOnMissHoles: false,
+    showNumbersOnMissHoles: true,
 
     // Button-Einstellungen
     buttonSize: '10.4vh', // Größe der Buttons
@@ -87,15 +88,15 @@ export const config = {
     joystickSize: '11.5vh',
     joystickHandleHeight: '40%',
     joystickMaxMovement: 51,
-    joystickSensitivity: 3,
-    joystickDeadzone: 4,
+    joystickSensitivity: 1,
+    joystickDeadzone: 0,
 
     // Expert Mode Einstellungen
-    expertModeHoleMovementRadiusTarget: 10,
-    expertModeHoleMovementSpeedTarget: 0.3,
+    expertModeHoleMovementRadiusTarget: 7,
+    expertModeHoleMovementSpeedTarget: 0.07,
     expertModeHoleMovementRadiusMiss: 5,
     expertModeHoleMovementSpeedMiss: 0.15,
-    expertModeHoleDirectionChangeInterval: 1000, // Intervall für Richtungsänderung in Millisekunden
+    expertModeHoleDirectionChangeInterval: 1500, // Intervall für Richtungsänderung in Millisekunden
     expertModeHoleDirectionAngleRange: 20,      // Winkelbereich für Richtungsänderung in Grad
 
     // Highscore Tabellen
