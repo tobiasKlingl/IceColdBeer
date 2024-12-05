@@ -20,7 +20,8 @@ import {
     writeBatch,
     doc,
     getDoc,
-    setDoc
+    setDoc,
+    Timestamp
 } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
 import { getAuth, signInAnonymously } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js';
 
@@ -34,6 +35,8 @@ signInAnonymously(auth)
     console.error('Fehler bei der anonymen Authentifizierung:', error);
   });
 
+let currentModeIndex = config.gameModeKeys.indexOf(gameState.viewMode); // Aktuellen Modus im Array finden
+
 /* Deklariere die Swipe-Buttons einmal außerhalb der Funktion */
 const swipeLeftButton = document.getElementById('swipeLeftButton');
 const swipeRightButton = document.getElementById('swipeRightButton');
@@ -41,16 +44,16 @@ const swipeRightButton = document.getElementById('swipeRightButton');
 /* Event Listener für Swipe Buttons hinzufügen */
 if (swipeLeftButton && swipeRightButton) {
     swipeLeftButton.addEventListener('click', () => {
-        // Wechsel zu 'normal' bei Swipe nach links
-        const newMode = gameState.viewMode === 'expert' ? 'normal' : 'expert';
-        gameState.viewMode = newMode;
+        // Wechsel zum nächsten Game Modus (links)
+        currentModeIndex = (currentModeIndex === 0) ? config.gameModeKeys.length - 1 : currentModeIndex - 1;
+        gameState.viewMode = config.gameModeKeys[currentModeIndex];
         showEndScreen(false, true);
     });
 
     swipeRightButton.addEventListener('click', () => {
-        // Wechsel zu 'expert' bei Swipe nach rechts
-        const newMode = gameState.viewMode === 'expert' ? 'normal' : 'expert';
-        gameState.viewMode = newMode;
+        // Wechsel zum nächsten Game Modus (rechts)
+        currentModeIndex = (currentModeIndex + 1) % config.gameModeKeys.length;
+        gameState.viewMode = config.gameModeKeys[currentModeIndex];
         showEndScreen(false, true);
     });
 }
@@ -78,14 +81,15 @@ function handleGesture() {
 
     if (touchEndX < touchStartX - swipeThreshold) {
         // Swipe nach links
-        const newMode = gameState.viewMode === 'expert' ? 'normal' : 'expert';
-        gameState.viewMode = newMode;
+        currentModeIndex = (currentModeIndex + 1) % config.gameModeKeys.length;
+        gameState.viewMode = config.gameModeKeys[currentModeIndex];
         showEndScreen(false, true);
     }
 
     if (touchEndX > touchStartX + swipeThreshold) {
-        const newMode = gameState.viewMode === 'expert' ? 'normal' : 'expert';
-        gameState.viewMode = newMode;
+        // Swipe nach rechts
+        currentModeIndex = (currentModeIndex === 0) ? config.gameModeKeys.length - 1 : currentModeIndex - 1;
+        gameState.viewMode = config.gameModeKeys[currentModeIndex];
         showEndScreen(false, true);
     }
 }
@@ -107,9 +111,13 @@ export async function showEndScreen(won, directAccess = false) {
 
     // Bestimme den Modus für die Highscore-Anzeige
     const displayMode = directAccess ? gameState.viewMode : gameState.mode;
+    const modeConfig = config.gameModes[displayMode];
 
-    // Highscore-Titel setzen mit Emoji
-    highScoreTitle.textContent = `Highscore - ${displayMode === 'expert' ? 'Experte 💀' : 'Normal 😀'}`;
+    // Setze den Titel in zwei Zeilen
+    highScoreTitle.innerHTML = `
+    <span class="highscore-main">Highscore 🏆</span><br>
+    <span class="highscore-mode">${modeConfig.title.toUpperCase()} ${modeConfig.emoji}</span>
+    `;
 
     // Endscreen anzeigen und Timer stoppen
     endScreen.style.display = 'flex';
@@ -146,12 +154,11 @@ export async function showEndScreen(won, directAccess = false) {
         name: '',
         level: parseInt(gameState.currentTarget - 1, 10),
         lives: parseInt(gameState.lives, 10),
-        time: parseInt(gameState.elapsedTime, 10)
+        time: parseInt(gameState.elapsedTime, 10),
+        date: Timestamp.now()
     };
-
-    // Firestore Collection basierend auf dem displayMode
-    const collectionName = displayMode === 'expert' ? 'highscores_expert' : 'highscores_normal';
-    const highscoreCollection = collection(db, collectionName);
+    
+    const highscoreCollection = collection(db, modeConfig.highscoreSheetName);
 
     try {
         // Highscores abrufen
@@ -280,12 +287,19 @@ export async function showEndScreen(won, directAccess = false) {
      * @param {Array} highScores - Array der Highscore-Objekte.
      */
     function displayHighScores(highScores) {
-        const highScoresList = document.getElementById('highScores');
+        const highScoresTableBody = document.getElementById('highScoreItems');
         const highScoreTitle = document.getElementById('highScoreTitle');
-
-        highScoreTitle.textContent = `Highscore - ${gameState.viewMode === 'expert' ? 'Experte 💀' : 'Normal 😀'}`;
-
-        // Sortieren der Highscores
+    
+        // Hole die Konfiguration für den aktuellen Modus
+        const modeConfig = config.gameModes[gameState.viewMode];
+    
+        // Setze den Titel in zwei Zeilen
+        highScoreTitle.innerHTML = `
+            <span class="highscore-main">Highscore 🏆</span><br>
+            <span class="highscore-mode">${modeConfig.title.toUpperCase()} ${modeConfig.emoji}</span>
+        `;
+    
+        // Sortiere die Highscores
         highScores.sort((a, b) => {
             if (b.level !== a.level) {
                 return b.level - a.level; // Höheres Level ist besser
@@ -295,19 +309,33 @@ export async function showEndScreen(won, directAccess = false) {
                 return a.time - b.time; // Weniger Zeit ist besser
             }
         });
-
-        // Begrenzung auf Top 10 Highscores
+    
+        // Begrenze auf Top 10
         highScores = highScores.slice(0, 10);
-
-        highScoresList.innerHTML = '';
+    
+        // Tabelle leeren
+        highScoresTableBody.innerHTML = '';
+    
+        // Highscores einfügen
         highScores.forEach((score, index) => {
-            const li = document.createElement('li');
             const minutes = Math.floor(score.time / 60).toString().padStart(2, '0');
             const seconds = (score.time % 60).toString().padStart(2, '0');
-            li.textContent = `${capitalizeName(score.name)} - Level: ${score.level}, Leben: ${score.lives}, Zeit: ${minutes}:${seconds}`;
-            highScoresList.appendChild(li);
+            const formattedDate = score.date.toDate().toLocaleDateString(); // Datum formatieren
+    
+            // Erstelle eine neue Tabellenzeile
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${capitalizeName(score.name)}</td>
+                <td>${score.level}</td>
+                <td>${score.lives}</td>
+                <td>${minutes}:${seconds}</td>
+                <td>${formattedDate}</td>
+            `;
+            highScoresTableBody.appendChild(tr);
         });
     }
+    
 
     /**
      * Funktion, um zu prüfen, ob der Spieler in die Highscores kommen sollte.

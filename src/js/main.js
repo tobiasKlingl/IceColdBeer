@@ -9,6 +9,7 @@
 import { showEndScreen } from './highscore.js';
 import { initializeGame, gameState, resetGame} from './gameState.js';
 import { setCSSVariables } from './utils.js';
+import { config } from './config.js';
 
 /**
  * Funktion zum Starten des Spiels.
@@ -35,28 +36,38 @@ window.onload = function() {
     setCSSVariables(); // CSS-Variablen setzen
 
     // Modus-Auswahl-Buttons
-    const normalModeButton = document.getElementById('normalModeButton');
+    const beginnerModeButton = document.getElementById('beginnerModeButton');
+    const advancedModeButton = document.getElementById('advancedModeButton');
     const expertModeButton = document.getElementById('expertModeButton');
     const viewHighscoresButton = document.getElementById('viewHighscoresButton');
     const backToModeSelectionButton = document.getElementById('backToModeSelectionButton');
 
-    if (normalModeButton && expertModeButton && viewHighscoresButton && backToModeSelectionButton) {
-        normalModeButton.addEventListener('click', () => {
-            gameState.mode = 'normal';
-            gameState.viewMode = 'normal'; // Setze viewMode auf 'normal'
+    if (beginnerModeButton && advancedModeButton && expertModeButton && viewHighscoresButton && backToModeSelectionButton) {
+        beginnerModeButton.addEventListener('click', () => {
+            const mode = 'beginner';
+            gameState.mode = mode;
+            gameState.viewMode = mode;
+            startGame();
+        });
+
+        advancedModeButton.addEventListener('click', () => {
+            const mode = 'advanced'
+            gameState.mode = mode;
+            gameState.viewMode = mode;
             startGame();
         });
 
         expertModeButton.addEventListener('click', () => {
-            gameState.mode = 'expert';
-            gameState.viewMode = 'expert'; // Setze viewMode auf 'expert'
+            const mode = 'expert'
+            gameState.mode = mode;
+            gameState.viewMode = mode;
             startGame();
         });
 
         viewHighscoresButton.addEventListener('click', () => {
-            // Setze viewMode auf 'normal' als Standard, falls nicht bereits gesetzt
-            if (!['normal', 'expert'].includes(gameState.viewMode)) {
-                gameState.viewMode = 'normal';
+            // Überprüfe, ob der aktuelle viewMode ein gültiger Modus ist
+            if (!config.gameModeKeys.includes(gameState.viewMode)) {
+                gameState.viewMode = 'beginner'; // Setze einen Standardmodus (z. B. 'beginner')
             }
             showEndScreen(false, true); // Zeige Highscore-Bildschirm ohne Spielende
         });

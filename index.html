@@ -16,9 +16,10 @@
     <div id="modeSelectionScreen">
         <h1>Ice Cold Beer 🍺</h1>
         <h2>Wähle den Spielmodus:</h2>
-        <button id="normalModeButton">Normal</button>
-        <button id="expertModeButton">Experte</button>
-        <button id="viewHighscoresButton">Highscores ansehen</button>
+        <button id="beginnerModeButton">Beginner 🐣</button>
+        <button id="advancedModeButton">Fortgeschritten 🚀</button>
+        <button id="expertModeButton">Experte 💀</button>
+        <button id="viewHighscoresButton">Highscores ansehen 🏆</button>
     </div>
 
     <!-- Kopfbereich der Seite -->
@@ -84,8 +85,25 @@
         </div>
         <!-- Highscore-Liste -->
         <div id="highScoreList">
-            <h2 id="highScoreTitle">Highscores - Normal 😀</h2>
-            <ol id="highScores"></ol>
+            <h2 id="highScoreTitle">
+                <span class="highscore-main">Highscore 🏆</span><br>
+                <span class="highscore-mode">Beginner 🐣</span>
+            </h2>
+            <table id="highScoreTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Level</th>
+                        <th>Leben</th>
+                        <th>Zeit</th>
+                        <th>Datum</th>
+                    </tr>
+                </thead>
+                <tbody id="highScoreItems">
+                    <!-- Zeilen werden hier dynamisch eingefügt -->
+                </tbody>
+            </table>
             <!-- Swipe-Buttons in der swipeHint-Anzeige platzieren -->
             <p id="swipeHint">
                 <button id="swipeLeftButton" class="swipe-button">⇐</button>

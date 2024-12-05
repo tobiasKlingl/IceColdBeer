@@ -6,6 +6,7 @@
  */
 
 import { gameState } from './gameState.js';
+import { config} from './config.js';
 
 /**
  * Funktion zur Initialisierung der Benutzeroberfläche.
@@ -33,14 +34,14 @@ export function updateDisplay() {
     }
     livesDisplay.textContent = 'Leben: ' + hearts;
 
-    // Aktuelles Modus anzeigen mit Emoji
-    let modeEmoji = '';
-    if (gameState.mode === 'expert') {
-        modeEmoji = '💀'; // Totenkopf für Experte
+    // Aktuellen Modus anzeigen mit Emoji aus der Konfiguration
+    const modeConfig = config.gameModes[gameState.mode];
+    if (modeConfig) {
+        currentModeDisplay.textContent = `Modus: ${modeConfig.emoji}`;
     } else {
-        modeEmoji = '😀'; // Lächelndes Gesicht für Normal
+        console.error(`Unbekannter Modus: ${gameState.mode}`);
+        currentModeDisplay.textContent = 'Modus: ❓'; // Fallback für unbekannten Modus
     }
-    currentModeDisplay.textContent = `Modus: ${modeEmoji}`; // Nur "Modus: " und Emoji
 
     // Aktuelles Ziel anzeigen
     currentHoleDisplay.textContent = 'Ziel: Loch ' + gameState.currentTarget;

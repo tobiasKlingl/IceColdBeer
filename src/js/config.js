@@ -21,7 +21,7 @@ export const config = {
     elementBackgroundOpacity: 0.7,
 
     // Ball-Eigenschaften
-    ballRadius: 9,
+    ballRadius: 8,
     ballStartXFraction: 0.85,
     ballColor: '#444444',
 
@@ -99,9 +99,24 @@ export const config = {
     expertModeHoleDirectionChangeInterval: 1500, // Intervall für Richtungsänderung in Millisekunden
     expertModeHoleDirectionAngleRange: 20,      // Winkelbereich für Richtungsänderung in Grad
 
-    // Highscore Tabellen
-    highscoreSheetNames: {
-        normal: 'normal',
-        expert: 'expert'
+    gameModeKeys: ['beginner', 'advanced', 'expert'],
+
+    // Konfigurierung Spielmodi mit zugehörigen Emojis
+    gameModes: {
+        'beginner': { 
+            title: 'Beginner',
+            highscoreSheetName: 'highscores_beginner',
+            emoji: '🐣' // Küken für Anfänger
+        }, 
+        'advanced': { 
+            title: 'Fortgeschritten',
+            highscoreSheetName: 'highscores_advanced',
+            emoji: '🚀' // Rakete für Fortgeschrittene. Alternative: 🧗 (Kletterer, steht für Herausforderung und Fortschritt)
+        }, 
+        'expert': { 
+            title: 'Experte',
+            highscoreSheetName: 'highscores_expert',
+            emoji: '💀' // Totenkopf, für extreme Schwierigkeit
+        },
     },
 };

@@ -159,6 +159,23 @@ header h1 {
     align-items: center;
 }
 
+#highScoreHeader {
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr 1fr 1fr 2fr; /* Spalten für: #, Name, Level, Leben, Zeit, Datum */
+    gap: 10px;
+}
+
+#highScoreItems li {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr 1fr 1fr 2fr;
+    gap: 10px;
+    text-align: center;
+}
+
 #playerName {
     padding: 5px;
     font-size: 2vh;
@@ -181,7 +198,7 @@ header h1 {
     width: 80%;
 }
 
-#restartButton, #resetHighscoresButton {
+#restartButton {
     padding: 10px 20px;
     margin: 10px 0;
     background-color: var(--button-color);
@@ -192,6 +209,10 @@ header h1 {
     font-size: 2.5vh;
     transition: background-color 0.3s ease;
     width: 80%;
+}
+
+#resetHighscoresButton {
+    display: none; /* Versteckt den Button */
 }
 
 #submitScoreButton:hover, #restartButton:hover, #resetHighscoresButton:hover {
@@ -334,3 +355,47 @@ header h1 {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
+#highScoreTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 1em;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: transparent;;
+    box-shadow: none;
+    color: #fff;
+}
+
+#highScoreTable th, #highScoreTable td {
+    padding: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Transparenter Rand */
+}
+
+#highScoreTable th {
+    background-color: rgba(0, 0, 0, 0.5); /* Halbtransparenter Hintergrund für Header */
+    font-weight: bold;
+}
+
+#highScoreTable tr:nth-child(even) {
+    background-color: rgba(0, 0, 0, 0.3); /* Alternierender Hintergrund */
+}
+
+#highScoreTable tr:hover {
+    background-color: rgba(255, 255, 255, 0.1); /* Highlight-Effekt beim Hover */
+}
+
+.highscore-main {
+    font-size: 2em;
+    font-weight: bold;
+    text-align: center;
+    display: block;
+}
+
+.highscore-mode {
+    font-size: 1.25em;
+    font-weight: bold;
+    text-align: center;
+    display: block;
+    text-transform: uppercase;
+}

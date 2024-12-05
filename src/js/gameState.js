@@ -7,6 +7,7 @@
 
 import { config } from './config.js';
 import { holesData } from '../data/holesData.js';
+import { holesDataOriginal } from '../data/holesData_original.js';
 import { setupInputHandlers } from './input.js';
 import { draw } from './render.js';
 import { initializeUI, updateDisplay } from './ui.js';
@@ -40,8 +41,8 @@ export const gameState = {
     currentTarget: 1,      // Aktuelles Ziel-Loch
     gameOver: false,       // Spielstatus
     ballInHole: false,     // Status der Kugel
-    mode: null,            // 'normal' oder 'expert'
-    viewMode: 'normal',    // Modus für Highscore-Anzeige
+    mode: null,            // 'beginner', 'advanced' oder 'expert'
+    viewMode: 'beginner',    // Modus für Highscore-Anzeige
     animationFrameId: null, // ID des requestAnimationFrame
 };
 
@@ -153,7 +154,7 @@ export function initializeGame() {
     initializeUI();
 
     // Lochdaten laden
-    loadHoleData();
+    loadHoleData(gameState.mode);
 
     // Spielvariablen initialisieren
     resetGame();
@@ -207,13 +208,22 @@ function resizeCanvas() {
 /**
  * Funktion zum Laden der Lochdaten.
  */
-function loadHoleData() {
-    gameState.holes = holesData.map(hole => ({
-        x: hole.X,
-        y: hole.Y,
-        radius: hole.Radius,
-        Type: hole.Type
-    }));
+function loadHoleData(mode) {
+    if (mode == 'beginner') {
+        gameState.holes = holesDataOriginal.map(hole => ({
+            x: hole.X,
+            y: hole.Y,
+            radius: hole.Radius,
+            Type: hole.Type
+        }))
+    } else {
+        gameState.holes = holesData.map(hole => ({
+            x: hole.X,
+            y: hole.Y,
+            radius: hole.Radius,
+            Type: hole.Type
+        }))
+    }
 }
 
 /**
