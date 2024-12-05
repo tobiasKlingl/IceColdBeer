@@ -78,7 +78,10 @@ export function applyPhysics() {
         const dy = gameState.ball.y - hole.actualY;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
-        if (distance + gameState.ball.radius * config.holeOverlapThreshold <= hole.actualRadius) {
+        const holeTypeNum = parseInt(hole.Type, 10);
+        let holeOverlapThreshold = holeTypeNum <= config.totalLevels ? config.holeOverlapThresholdTarget : config.holeOverlapThresholdMiss
+
+        if (distance + gameState.ball.radius * holeOverlapThreshold <= hole.actualRadius) {
             handleHoleCollision(hole);
             return; // Funktion verlassen
         }

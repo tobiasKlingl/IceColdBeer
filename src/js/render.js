@@ -38,12 +38,14 @@ export function draw() {
         gameState.ctx.closePath();
 
         // Weißen Rand zeichnen
-        gameState.ctx.beginPath();
-        gameState.ctx.arc(hole.actualX, hole.actualY, hole.actualRadius, 0, Math.PI * 2);
-        gameState.ctx.lineWidth = config.holeBorderWidth;
-        gameState.ctx.strokeStyle = config.colors.holeBorderColor;
-        gameState.ctx.stroke();
-        gameState.ctx.closePath();
+        if ( holeTypeNum <= config.totalLevels) {
+            gameState.ctx.beginPath();
+            gameState.ctx.arc(hole.actualX, hole.actualY, hole.actualRadius, 0, Math.PI * 2);
+            gameState.ctx.lineWidth = config.holeBorderWidth;
+            gameState.ctx.strokeStyle = config.colors.holeBorderColor;
+            gameState.ctx.stroke();
+            gameState.ctx.closePath();
+        }
 
         // Nummer anzeigen
         if ((holeTypeNum >= 1 && holeTypeNum <= config.totalLevels) || config.showNumbersOnMissHoles) {

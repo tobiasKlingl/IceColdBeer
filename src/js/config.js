@@ -41,8 +41,10 @@ export const config = {
     wallBounceDamping: 0.66, // Zwischen 0 und 1
 
     // Loch-Einstellungen
-    holeOverlapThreshold: 0.8,
-    holeBorderWidth: 1.5,
+    holeOverlapThresholdMiss: 0.95,    // overlap threshold miss holes
+    holeOverlapThresholdTarget: 0.825,  // overlap threshold target holes
+    holeBorderWidth: 1.5,              // border of target holes
+    
     colors: {
         currentTargetHoleColor: 'rgba(255, 255, 0, 0.8)',
         otherTargetHoleColor: 'rgba(0, 255, 0, 0.8)',
@@ -64,7 +66,7 @@ export const config = {
     maxLives: 3,
 
     // Anzeigeeinstellungen
-    showNumbersOnMissHoles: false,
+    showNumbersOnMissHoles: true,
 
     // Button-Einstellungen
     buttonSize: '10.4vh', // Größe der Buttons
