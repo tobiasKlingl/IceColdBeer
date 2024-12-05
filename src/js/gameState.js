@@ -36,6 +36,7 @@ export const gameState = {
     },
     startTime: null,       // Startzeit des Spiels
     elapsedTime: 0,        // Verstrichene Zeit
+    timeLastHole: 0,       // Zeit zu der der letzte Punkt gescored wurde
     timerInterval: null,   // Interval-ID für den Timer
     lives: config.maxLives, // Aktuelle Leben
     currentTarget: 1,      // Aktuelles Ziel-Loch
@@ -59,6 +60,9 @@ export function resetGame() {
 
     // Stange und Kugel initialisieren
     initializeBarAndBall();
+
+    // Lochdaten laden
+    loadHoleData();
 
     // Löcher skalieren und Position anpassen
     scaleAndPositionHoles();
@@ -153,9 +157,6 @@ export function initializeGame() {
     // UI initialisieren
     initializeUI();
 
-    // Lochdaten laden
-    loadHoleData(gameState.mode);
-
     // Spielvariablen initialisieren
     resetGame();
 
@@ -208,8 +209,8 @@ function resizeCanvas() {
 /**
  * Funktion zum Laden der Lochdaten.
  */
-function loadHoleData(mode) {
-    if (mode == 'beginner') {
+function loadHoleData() {
+    if (gameState.mode == 'beginner') {
         gameState.holes = holesDataOriginal.map(hole => ({
             x: hole.X,
             y: hole.Y,

@@ -121,10 +121,13 @@ function handleCorrectHole() {
         '✨ Super Schuss! Auf zu Loch ' + (gameState.currentTarget + 1) + '!',
     ];
 
+    gameState.timeLastHole = gameState.elapsedTime;
+
     // Lochbewegung stoppen
     if (gameState.mode === 'expert') {
         stopHoleMovement();
     }
+
 
     const message = messages[Math.floor(Math.random() * messages.length)];
     showTemporaryMessage(message, 1500, () => {

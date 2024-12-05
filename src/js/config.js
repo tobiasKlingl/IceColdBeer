@@ -21,8 +21,8 @@ export const config = {
     elementBackgroundOpacity: 0.7,
 
     // Ball-Eigenschaften
-    ballRadius: 8,
-    ballStartXFraction: 0.85,
+    ballRadius: 7,
+    ballStartXFraction: 0.9,
     ballColor: '#444444',
 
     // Stangen-Eigenschaften
@@ -42,7 +42,7 @@ export const config = {
 
     // Loch-Einstellungen
     holeOverlapThreshold: 0.8,
-    holeBorderWidth: 2.5,
+    holeBorderWidth: 1.5,
     colors: {
         currentTargetHoleColor: 'rgba(255, 255, 0, 0.8)',
         otherTargetHoleColor: 'rgba(0, 255, 0, 0.8)',
@@ -64,7 +64,7 @@ export const config = {
     maxLives: 3,
 
     // Anzeigeeinstellungen
-    showNumbersOnMissHoles: true,
+    showNumbersOnMissHoles: false,
 
     // Button-Einstellungen
     buttonSize: '10.4vh', // Größe der Buttons

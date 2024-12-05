@@ -154,7 +154,7 @@ export async function showEndScreen(won, directAccess = false) {
         name: '',
         level: parseInt(gameState.currentTarget - 1, 10),
         lives: parseInt(gameState.lives, 10),
-        time: parseInt(gameState.elapsedTime, 10),
+        time: parseInt(gameState.timeLastHole, 10),
         date: Timestamp.now()
     };
     
