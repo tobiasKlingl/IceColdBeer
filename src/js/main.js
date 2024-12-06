@@ -9,7 +9,7 @@
 import { showEndScreen } from './highscore.js';
 import { initializeGame, gameState, resetGame} from './gameState.js';
 import { setCSSVariables } from './utils.js';
-import { config } from './config.js';
+import { config, } from './config.js';
 
 /**
  * Funktion zum Umschalten des Version-Tags.
@@ -17,9 +17,21 @@ import { config } from './config.js';
 function toggleVersionDisplay() {
     const versionDisplay = document.querySelector('.version-display');
     const modeSelectionScreen = document.getElementById('modeSelectionScreen');
+    const gameContainer = document.querySelector('.game-container');
+    const highScoreScreen = document.getElementById('endScreen');
 
-    if (versionDisplay && modeSelectionScreen) {
-        versionDisplay.style.display = modeSelectionScreen.style.display !== 'none' ? 'block' : 'none';
+
+    if (versionDisplay) {
+        if (modeSelectionScreen.style.display !== 'none') {
+            // Nur auf dem Hauptbildschirm anzeigen
+            versionDisplay.style.display = 'block';
+            const logicalWidth = window.screen.width; // Logische Breite in CSS-Pixel
+            const physicalWidth = logicalWidth * window.devicePixelRatio; // Physische Breite in Pixeln
+            //versionDisplay.textContent = `Version: {{ VERSION_TAG }}, LB: ${logicalWidth}px, PB: ${physicalWidth}px`;
+        } else if (gameContainer.style.display !== 'none' || highScoreScreen.style.display !== 'none') {
+            // Ausblenden, wenn Spiel oder Highscore angezeigt werden
+            versionDisplay.style.display = 'none';
+        }
     }
 }
 
@@ -36,19 +48,17 @@ function startGame() {
     document.querySelector('.game-info').style.display = 'flex';
     document.querySelector('.controls').style.display = 'flex';
 
-    // Version Tag aktualisieren
-    toggleVersionDisplay();
-
     // Initialize game
+    toggleVersionDisplay()
     initializeGame();
-
-    // Start game loop or other game logic
-    // Hier kannst du deine Spiel-Logik starten
 }
 
 // Sobald das Fenster vollständig geladen ist, initialisiere das Spiel
 window.onload = function() {
     setCSSVariables(); // CSS-Variablen setzen
+
+    // Version Tag aktualisieren
+    toggleVersionDisplay();
 
     // Modus-Auswahl-Buttons
     const beginnerModeButton = document.getElementById('beginnerModeButton');

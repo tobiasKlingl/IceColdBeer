@@ -161,14 +161,25 @@ function setupJoystick(joystickId, side) {
 /**
  * Funktion zum Aktualisieren der Stangenpositionen.
  */
-export function updateBars() {
+export function updateBars(deltaTime) {
     const adjustedHeight = gameState.canvas.height / (window.devicePixelRatio || 1);
 
-    // Linke Stange bewegen
-    gameState.bar.leftY += gameState.bar.leftYSpeed;
+    // Update left bar position
+    gameState.bar.leftY += gameState.bar.leftYSpeed * deltaTime;
     gameState.bar.leftY = Math.max(0, Math.min(adjustedHeight, gameState.bar.leftY));
 
-    // Rechte Stange bewegen
-    gameState.bar.rightY += gameState.bar.rightYSpeed;
+    // Update right bar position
+    gameState.bar.rightY += gameState.bar.rightYSpeed * deltaTime;
     gameState.bar.rightY = Math.max(0, Math.min(adjustedHeight, gameState.bar.rightY));
+
+    // Apply damping only if there's no active input
+    if (gameState.bar.leftYSpeed !== 0 && !gameState.activeInputLeft) {
+        gameState.bar.leftYSpeed *= config.barSpeedDampingFactor;
+        if (Math.abs(gameState.bar.leftYSpeed) < 0.01) gameState.bar.leftYSpeed = 0;
+    }
+
+    if (gameState.bar.rightYSpeed !== 0 && !gameState.activeInputRight) {
+        gameState.bar.rightYSpeed *= config.barSpeedDampingFactor;
+        if (Math.abs(gameState.bar.rightYSpeed) < 0.01) gameState.bar.rightYSpeed = 0;
+    }
 }

@@ -1,5 +1,3 @@
-// src/js/physics.js
-
 /**
  * physics.js
  * Enthält die Physikberechnungen für das Spiel.
@@ -13,7 +11,7 @@ import { updateDisplay, showTemporaryMessage } from './ui.js';
 import { updateBars } from './input.js';
 import { stopHoleMovement } from './holeMovement.js';
 
-export function applyPhysics() {
+export function applyPhysics(deltaTime) {
     if (gameState.gameOver || gameState.ballInHole) {
         return; // Physikberechnungen stoppen
     }
@@ -21,8 +19,10 @@ export function applyPhysics() {
     const adjustedWidth = gameState.canvas.width / (window.devicePixelRatio || 1);
     const adjustedHeight = gameState.canvas.height / (window.devicePixelRatio || 1);
 
+    const gravityInPixels = config.gravity * config.metersToPixels;
+
     // Aktualisiere die Position der Stangen basierend auf der Eingabe
-    updateBars();
+    updateBars(deltaTime);
 
     const barSlope = (gameState.bar.rightY - gameState.bar.leftY) / adjustedWidth;
     const angle = Math.atan(barSlope); // Neigungswinkel der Stange
@@ -30,42 +30,75 @@ export function applyPhysics() {
     const barYAtBallX = gameState.bar.leftY + barSlope * gameState.ball.x;
 
     const isOnBar = (
-        gameState.ball.y + gameState.ball.radius >= barYAtBallX - gameState.bar.height / 2 - 0.5 &&
-        gameState.ball.y + gameState.ball.radius <= barYAtBallX + gameState.bar.height / 2 + 0.5 &&
+        gameState.ball.y + gameState.ball.radius >= barYAtBallX - gameState.bar.height / 2 - 0.5 && // - Math.abs(gameState.bar.leftYSpeed * deltaTime) &&
+        gameState.ball.y + gameState.ball.radius <= barYAtBallX + gameState.bar.height / 2 + 0.5 && // + Math.abs(gameState.bar.rightYSpeed * deltaTime) &&
         gameState.ball.x >= 0 &&
         gameState.ball.x <= adjustedWidth
     );
 
+    console.log("deltaTime = " + deltaTime)
+    console.log("gameState.ball.x = " + gameState.ball.x)
+    console.log("gameState.ball.y = " + gameState.ball.y)
+    console.log("gameState.ball.speedX = " + gameState.ball.speedX)
+    console.log("gameState.ball.speedY = " + gameState.ball.speedY)
+    console.log("gameState.bar.leftYspeed = " + gameState.bar.leftYSpeed)
+    console.log("gameState.bar.rightYspeed = " + gameState.bar.rightYSpeed)
+
     if (isOnBar) {
+        console.log("TEST1")
         // Kugel ist auf der Stange
         // Position der Kugel an die Stange koppeln
         gameState.ball.y = barYAtBallX - gameState.ball.radius - gameState.bar.height / 2;
         gameState.ball.speedY = 0; // Vertikale Geschwindigkeit auf 0 setzen
 
         // Schwerkraftkomponente entlang der Stange
-        const gravityAlongBar = config.gravity * Math.sin(angle);
+        const gravityForceAlongBar = gravityInPixels * Math.sin(angle);
 
-        if (Math.abs(gameState.ball.speedX) < config.staticFrictionThreshold && Math.abs(gravityAlongBar) < config.staticFrictionThreshold) {
-            // Kugel ruht aufgrund der Haftreibung
-            gameState.ball.speedX = 0;
+        // Haftreibung prüfen
+        const normalForce = gravityInPixels * Math.cos(angle);
+        const staticFrictionForce = config.staticFrictionCoefficient * normalForce
+
+        console.log("angle = " + angle)
+        console.log("normalForce = " + normalForce)
+        console.log("gravityForceAlongBar = " + gravityForceAlongBar)
+        console.log("staticFrictionForce: " + staticFrictionForce)
+
+
+        // Haftreibung prüfen
+        if (Math.abs(gameState.ball.speedX) < 1e-5) { // Kugel steht fast still
+            if (Math.abs(gravityForceAlongBar) <= staticFrictionForce) {
+                gameState.ball.speedX = 0;
+            } else {
+                // Kugel bewegt sich, kinetische Reibung anwenden
+                const kineticFrictionForce = Math.sign(gameState.ball.speedX) * config.kineticFrictionCoefficient * normalForce;
+                console.log("kineticFrictionFroce = " + kineticFrictionForce)
+                const netForce = gravityForceAlongBar - kineticFrictionForce;
+                gameState.ball.speedX += netForce * deltaTime;
+            }
         } else {
-            // Kugel bewegt sich, kinetische Reibung anwenden
-            gameState.ball.speedX += gravityAlongBar;
-            gameState.ball.speedX *= config.friction;
+             // Kugel bewegt sich bereits, kinetische Reibung anwenden
+             const kineticFrictionForce = Math.sign(gameState.ball.speedX) * config.kineticFrictionCoefficient * normalForce;
+             console.log("kineticFrictionFroce = " + kineticFrictionForce)
+             const netForce = gravityForceAlongBar - kineticFrictionForce;
+             gameState.ball.speedX += netForce * deltaTime;
         }
     } else {
         // Kugel ist nicht auf der Stange
-        gameState.ball.speedY += config.gravity; // Schwerkraft anwenden
+        console.log("TEST2")
+        gameState.ball.speedY += gravityInPixels * deltaTime; // Schwerkraft anwenden
     }
 
+    // Quadratischer Luftwiderstand in der Luft
+    applyAirResistance(gameState.ball, deltaTime);
+
     // Position aktualisieren
-    gameState.ball.x += gameState.ball.speedX;
-    gameState.ball.y += gameState.ball.speedY;
+    gameState.ball.x += gameState.ball.speedX * deltaTime;
+    gameState.ball.y += gameState.ball.speedY * deltaTime;
 
     // Grenzen prüfen und Dämpfung anwenden
     if (gameState.ball.x - gameState.ball.radius < 0) {
         gameState.ball.x = gameState.ball.radius;
-        gameState.ball.speedX = -gameState.ball.speedX * (1 - config.wallBounceDamping);
+        gameState.ball.speedX = - gameState.ball.speedX * (1 - config.wallBounceDamping);
     }
     if (gameState.ball.x + gameState.ball.radius > adjustedWidth) {
         gameState.ball.x = adjustedWidth - gameState.ball.radius;
@@ -79,7 +112,7 @@ export function applyPhysics() {
         const distance = Math.sqrt(dx * dx + dy * dy);
 
         const holeTypeNum = parseInt(hole.Type, 10);
-        let holeOverlapThreshold = holeTypeNum <= config.totalLevels ? config.holeOverlapThresholdTarget : config.holeOverlapThresholdMiss
+        let holeOverlapThreshold = holeTypeNum <= config.totalLevels ? config.holeOverlapThresholdTarget : config.holeOverlapThresholdMiss;
 
         if (distance + gameState.ball.radius * holeOverlapThreshold <= hole.actualRadius) {
             handleHoleCollision(hole);
@@ -95,6 +128,31 @@ export function applyPhysics() {
 }
 
 /**
+ * Funktion zur Berechnung des Luftwiderstandes
+ * @param {*} ball
+ */
+function applyAirResistance(ball, deltaTime) {
+    const speed = Math.sqrt(ball.speedX ** 2 + ball.speedY ** 2); // Betrag der Geschwindigkeit in Pixeln/s
+    const speedInMeters = speed * config.pixelsToMeters; // Geschwindigkeit in m/s
+
+    if (speed < 1e-5) return; // Kein Luftwiderstand, wenn keine Bewegung
+
+    // Luftwiderstandskraft (SI-Einheiten)
+    const dragForce = 0.5 * config.airDensity * config.dragCoefficient * Math.PI *
+    Math.pow(ball.radius * config.pixelsToMeters, 2) * Math.pow(speedInMeters, 2);
+
+    // Kraft in SI -> Beschleunigung in SI -> zurück in Pixel
+    const dragAcceleration = dragForce / config.ballMass;
+    const dragAccelerationInPixels = dragAcceleration * config.metersToPixels;
+
+    const dragX = (ball.speedX / speed) * dragAccelerationInPixels;
+    const dragY = (ball.speedY / speed) * dragAccelerationInPixels;
+
+    ball.speedX -= dragX * deltaTime;
+    ball.speedY -= dragY * deltaTime;
+}
+
+/**
  * Funktion zur Handhabung von Kollisionen mit Löchern.
  * @param {Object} hole - Das Loch, mit dem kollidiert wurde.
  */
@@ -103,13 +161,10 @@ function handleHoleCollision(hole) {
     const holeTypeNum = parseInt(hole.Type, 10);
 
     if (holeTypeNum === gameState.currentTarget) {
-        // Richtiges Loch
         handleCorrectHole();
     } else if (holeTypeNum >= 1 && holeTypeNum <= config.totalLevels) {
-        // Falsches Ziel-Loch
         handleIncorrectHole();
     } else {
-        // Verlustloch
         handleLossHole();
     }
 }
@@ -130,7 +185,6 @@ function handleCorrectHole() {
     if (gameState.mode === 'expert') {
         stopHoleMovement();
     }
-
 
     const message = messages[Math.floor(Math.random() * messages.length)];
     showTemporaryMessage(message, 1000, () => {

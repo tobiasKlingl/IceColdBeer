@@ -9,10 +9,18 @@ import { gameState } from './gameState.js';
 import { applyPhysics } from './physics.js';
 import { config } from './config.js';
 
+// Vorheriger Zeitstempel initialisieren
+let lastTimestamp = 0;
+
 /**
  * Hauptzeichnungsfunktion.
- */
-export function draw() {
+ * @param {DOMHighResTimeStamp} timestamp - Der aktuelle Zeitstempel in Millisekunden.
+*/
+export function draw(timestamp) {
+    // Zeitintervall berechnen (in Sekunden)
+    const deltaTime = (timestamp - lastTimestamp) / 1000; // ms -> s
+    lastTimestamp = timestamp;
+
     // Canvas leeren
     gameState.ctx.clearRect(0, 0, gameState.canvas.width, gameState.canvas.height);
 
@@ -79,7 +87,7 @@ export function draw() {
     gameState.ctx.closePath();
 
     // Physik anwenden
-    applyPhysics();
+    applyPhysics(deltaTime);
 
     // Nächsten Frame anfordern
     gameState.animationFrameId = requestAnimationFrame(draw);

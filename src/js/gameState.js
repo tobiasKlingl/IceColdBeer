@@ -5,7 +5,7 @@
  * Verwalten des Spielzustands und der Initialisierung.
  */
 
-import { config } from './config.js';
+import { config, estimateDisplayWidthInMeters } from './config.js';
 import { holesData } from '../data/holesData.js';
 import { holesDataOriginal } from '../data/holesData_original.js';
 import { setupInputHandlers } from './input.js';
@@ -154,6 +154,21 @@ export function initializeGame() {
     // Canvas-Größe einstellen
     resizeCanvas();
 
+    // Berechnung der physischen Canvas-Breite
+    const displayWidthInMeters = estimateDisplayWidthInMeters(); // Gesamte physische Breite des Displays
+    const logicalDisplayWidth = window.innerWidth; // Gesamte logische Breite des Displays in Pixeln
+
+    const canvasWidth = gameState.canvas.width / (window.devicePixelRatio || 1); // Canvas ("Spielfeld")-Breite in Pixeln
+    const pixelsPerMeter = logicalDisplayWidth / displayWidthInMeters;
+
+    // Berechnung der Canvas-Breite in Metern (Verhältnis zur Displaybreite)
+    const canvasWidthInMeters = canvasWidth / pixelsPerMeter;
+
+    // Dynamische Skalierung berechnen
+    config.canvasWidthInMeters = canvasWidthInMeters;
+    config.metersToPixels = canvasWidth / canvasWidthInMeters;
+    config.pixelsToMeters = 1 / config.metersToPixels;
+
     // UI initialisieren
     initializeUI();
 
@@ -166,6 +181,11 @@ export function initializeGame() {
     // Eingabe-Handler einrichten
     setupInputHandlers();
 
+    console.log(`Physische Breite (geschätzt): ${canvasWidthInMeters} m`);
+    console.log(`Meters to Pixels: ${config.metersToPixels}`);
+    console.log(`Pixels to Meters: ${config.pixelsToMeters}`);
+
+
     // Fenstergrößenänderung behandeln
     window.addEventListener('resize', function() {
         resetGame();
@@ -173,7 +193,10 @@ export function initializeGame() {
 
     // Spielschleife starten, falls nicht bereits gestartet
     if (gameState.animationFrameId === null) {
-        gameState.animationFrameId = requestAnimationFrame(draw);
+        gameState.animationFrameId = requestAnimationFrame(function (timestamp) {
+            gameState.lastTimestamp = timestamp; // Initialen Zeitstempel speichern
+            draw(timestamp); // Zeichnen starten
+        });
     }
 }
 
@@ -251,3 +274,5 @@ function ensureBallNotInHole() {
         }
     }
 }
+
+
