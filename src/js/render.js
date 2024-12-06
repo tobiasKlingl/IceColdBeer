@@ -57,7 +57,7 @@ export function draw() {
             gameState.ctx.fillText(
                 holeTypeNum,
                 hole.actualX,
-                hole.actualY - hole.actualRadius - 3.5 * config.holeBorderWidth
+                hole.actualY - hole.actualRadius - 2.5 * config.holeBorderWidth
             );
         }
     });

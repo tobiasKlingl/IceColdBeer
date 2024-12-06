@@ -133,7 +133,7 @@ function handleCorrectHole() {
 
 
     const message = messages[Math.floor(Math.random() * messages.length)];
-    showTemporaryMessage(message, 1500, () => {
+    showTemporaryMessage(message, 1000, () => {
         gameState.currentTarget++;
         if (gameState.currentTarget > config.totalLevels) {
             // Spiel gewonnen

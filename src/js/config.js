@@ -21,9 +21,9 @@ export const config = {
     elementBackgroundOpacity: 0.7,
 
     // Ball-Eigenschaften
-    ballRadius: 7,
+    ballRadius: 6,
     ballStartXFraction: 0.9,
-    ballColor: '#444444',
+    ballColor: '#505050', //'#444444',
 
     // Stangen-Eigenschaften
     barHeight: 5,
@@ -41,12 +41,12 @@ export const config = {
     wallBounceDamping: 0.66, // Zwischen 0 und 1
 
     // Loch-Einstellungen
-    holeOverlapThresholdMiss: 0.95,    // overlap threshold miss holes
-    holeOverlapThresholdTarget: 0.825,  // overlap threshold target holes
-    holeBorderWidth: 1.5,              // border of target holes
+    holeOverlapThresholdMiss: 0.99,    // overlap threshold miss holes
+    holeOverlapThresholdTarget: 0.95,  // overlap threshold target holes
+    holeBorderWidth: 3,              // border of target holes
     
     colors: {
-        currentTargetHoleColor: 'rgba(255, 255, 0, 0.8)',
+        currentTargetHoleColor: 'rgba(186, 85, 211, 0.8)', /* Ein kräftiges Lila mit 80% Deckkraft. Gelb: 'rgba(255, 255, 0, 0.8)' */
         otherTargetHoleColor: 'rgba(0, 255, 0, 0.8)',
         missHoleColor: 'rgba(255, 0, 0, 0.8)',
         holeBorderColor: 'rgba(255, 255, 255, 1)',
@@ -66,7 +66,7 @@ export const config = {
     maxLives: 3,
 
     // Anzeigeeinstellungen
-    showNumbersOnMissHoles: true,
+    showNumbersOnMissHoles: false,
 
     // Button-Einstellungen
     buttonSize: '10.4vh', // Größe der Buttons
@@ -87,7 +87,7 @@ export const config = {
     deltaYFraction: 0.06,
 
     // Joystick-Einstellungen
-    joystickSize: '11.5vh',
+    joystickSize: '11.75vh',
     joystickHandleHeight: '40%',
     joystickMaxMovement: 51,
     joystickSensitivity: 1,
@@ -95,9 +95,9 @@ export const config = {
 
     // Expert Mode Einstellungen
     expertModeHoleMovementRadiusTarget: 7,
-    expertModeHoleMovementSpeedTarget: 0.07,
+    expertModeHoleMovementSpeedTarget: 0.08,
     expertModeHoleMovementRadiusMiss: 5,
-    expertModeHoleMovementSpeedMiss: 0.15,
+    expertModeHoleMovementSpeedMiss: 0.13,
     expertModeHoleDirectionChangeInterval: 1500, // Intervall für Richtungsänderung in Millisekunden
     expertModeHoleDirectionAngleRange: 20,      // Winkelbereich für Richtungsänderung in Grad
 
