@@ -400,3 +400,15 @@ header h1 {
     display: block;
     text-transform: uppercase;
 }
+
+.version-display {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.7); 
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-family: Arial, sans-serif;
+}

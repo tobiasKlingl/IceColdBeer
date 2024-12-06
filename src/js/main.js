@@ -12,6 +12,18 @@ import { setCSSVariables } from './utils.js';
 import { config } from './config.js';
 
 /**
+ * Funktion zum Umschalten des Version-Tags.
+ */
+function toggleVersionDisplay() {
+    const versionDisplay = document.querySelector('.version-display');
+    const modeSelectionScreen = document.getElementById('modeSelectionScreen');
+
+    if (versionDisplay && modeSelectionScreen) {
+        versionDisplay.style.display = modeSelectionScreen.style.display !== 'none' ? 'block' : 'none';
+    }
+}
+
+/**
  * Funktion zum Starten des Spiels.
  */
 function startGame() {
@@ -23,6 +35,9 @@ function startGame() {
     document.querySelector('.game-container').style.display = 'block';
     document.querySelector('.game-info').style.display = 'flex';
     document.querySelector('.controls').style.display = 'flex';
+
+    // Version Tag aktualisieren
+    toggleVersionDisplay();
 
     // Initialize game
     initializeGame();
