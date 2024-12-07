@@ -2,7 +2,8 @@
 
 # 1. Sicherstellen dass man im master branch ist
 CURRENT_BRANCH=$(git branch --show-current)
-if [ "CURRENT_BRANCH" != "master" ]; then
+echo $CURRENT_BRANCH
+if [ "$CURRENT_BRANCH" != "master" ]; then
     echo "Error: Das Skript darf nur im Master-Branch ausgeführt werden."
     exit 1
 fi
@@ -10,6 +11,11 @@ fi
 # 2. Git-Commit-Hash holen
 COMMIT_HASH=$(git rev-parse --short HEAD)
 TAG=$(git describe --tags)
+
+if [ -z "$TAG" ]; then
+    echo "Error: Kein Git-Tag gefunden. Bitte einen Tag erstellen und erneut versuchen."
+    exit 1
+fi
 
 # 3. Platzhalter in der index.html und style.css ersetzen
 sed -i "s/{{ VERSION_TAG }}/$TAG/g" index.html
