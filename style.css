@@ -82,7 +82,7 @@ body, html {
     overflow: hidden;
     font-family: Arial, sans-serif;
     /* Hintergrundbild */
-    background-image: url('assets/retro_background.png?v={{ VERSION_TAG }}');
+    background-image: url('assets/retro_background.png?v=v1.0.1');
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
