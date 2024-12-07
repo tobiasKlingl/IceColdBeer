@@ -9,7 +9,12 @@
     <!-- Responsives Design für mobile Geräte -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <!-- Einbindung der CSS-Datei -->
-    <link rel="stylesheet" href="style.css?v={{ VERSION_TAG }}">
+    <link rel="stylesheet" href="style.css?v=">
+    <!-- SweetAlert2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <!-- Spielmodus-Auswahl -->
@@ -89,14 +94,31 @@
                 <span class="highscore-main">Highscore 🏆</span><br>
                 <span class="highscore-mode">Beginner 🐣</span>
             </h2>
+
+            <!-- Neue Tab-Navigation hinzufügen -->
+            <div class="highscore-tabs">
+                <button class="highscore-tab active" data-level="overall">🏆</button>
+                <button class="highscore-tab" data-level="1">1</button>
+                <button class="highscore-tab" data-level="2">2</button>
+                <button class="highscore-tab" data-level="3">3</button>
+                <button class="highscore-tab" data-level="4">4</button>
+                <button class="highscore-tab" data-level="5">5</button>
+                <button class="highscore-tab" data-level="6">6</button>
+                <button class="highscore-tab" data-level="7">7</button>
+                <button class="highscore-tab" data-level="8">8</button>
+                <button class="highscore-tab" data-level="9">9</button>
+                <button class="highscore-tab" data-level="10">10</button>
+            </div> 
+
+
             <table id="highScoreTable">
                 <thead>
                     <tr>
                         <th>#</th>
                         <th>Name</th>
                         <th>Level</th>
-                        <th>Leben</th>
                         <th>Zeit</th>
+                        <th>Leben</th>
                         <th>Datum</th>
                     </tr>
                 </thead>
@@ -117,10 +139,10 @@
     </div>
 
 
-    <div class="version-display" style="display: block;">Version: {{ VERSION_TAG }}</div>
+    <div class="version-display" style="display: block;">Version: </div>
 
     <!-- Einbindung der JavaScript-Datei -->
-    <script type="module" src="src/js/main.js?v={{ VERSION_TAG }}"></script>
+    <script type="module" src="src/js/main.js?v="></script>
 
 </body>
 </html>

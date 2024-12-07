@@ -20,14 +20,10 @@ function toggleVersionDisplay() {
     const gameContainer = document.querySelector('.game-container');
     const highScoreScreen = document.getElementById('endScreen');
 
-
     if (versionDisplay) {
         if (modeSelectionScreen.style.display !== 'none') {
             // Nur auf dem Hauptbildschirm anzeigen
             versionDisplay.style.display = 'block';
-            const logicalWidth = window.screen.width; // Logische Breite in CSS-Pixel
-            const physicalWidth = logicalWidth * window.devicePixelRatio; // Physische Breite in Pixeln
-            //versionDisplay.textContent = `Version: {{ VERSION_TAG }}, LB: ${logicalWidth}px, PB: ${physicalWidth}px`;
         } else if (gameContainer.style.display !== 'none' || highScoreScreen.style.display !== 'none') {
             // Ausblenden, wenn Spiel oder Highscore angezeigt werden
             versionDisplay.style.display = 'none';

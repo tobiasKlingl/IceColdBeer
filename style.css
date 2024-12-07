@@ -82,7 +82,7 @@ body, html {
     overflow: hidden;
     font-family: Arial, sans-serif;
     /* Hintergrundbild */
-    background-image: url('assets/retro_background.png?v={{ VERSION_TAG }}');
+    background-image: url('assets/retro_background.png?v=');
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
@@ -149,6 +149,16 @@ header h1 {
     overflow-y: auto;
 }
 
+#endMessage {
+    /*position: absolute; /* Ermöglicht die genaue Positionierung */
+    /*top: 20%; Abstand vom oberen Rand */
+    left: 50%; /* Zentrieren horizontal */
+    /*transform: translateX(-50%); /* Exakte Zentrierung */
+    color: #fff; /* Textfarbe */
+    text-align: center; /* Zentrierter Text */
+    font-size: 1.25em; /* Schriftgröße */
+}
+
 #endScreen > div, #endScreen > button {
     margin: 10px;
 }
@@ -168,6 +178,7 @@ header h1 {
     grid-template-columns: 1fr 2fr 1fr 1fr 1fr 2fr; /* Spalten für: #, Name, Level, Leben, Zeit, Datum */
     gap: 10px;
 }
+
 
 #highScoreItems li {
     display: grid;
@@ -199,12 +210,11 @@ header h1 {
 }
 
 #restartButton {
-    padding: 10px 10px;
-    margin: 10px 0;
+    padding: 11px 15px;
     background-color: var(--button-color);
     color: white;
     border: none;
-    border-radius: 30px;
+    border-radius: 20px;
     cursor: pointer;
     font-size: 2.5vh;
     transition: background-color 0.3s ease;
@@ -317,20 +327,21 @@ header h1 {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 25px;
     font-size: 2vh;
     text-align: center;
-    margin-top: 10px;
+    margin-top: 20px;
+    margin-bottom: 1px;
 }
 
 .swipe-button {
-    padding: 5px 10px;
-    font-size: 2vh;
+    padding: 11px 15px;
+    font-size: 2.5vh;
     cursor: pointer;
     background-color: #444;
     color: #fff;
     border: none;
-    border-radius: 5px;
+    border-radius: 20px;
     transition: background-color 0.3s;
 }
 
@@ -359,7 +370,7 @@ header h1 {
 #highScoreTable {
     width: 100%;
     border-collapse: collapse;
-    margin: 20px 0;
+    margin: 2px 0;
     font-size: 0.8em;
     font-family: Arial, sans-serif;
     text-align: center;
@@ -369,7 +380,7 @@ header h1 {
 }
 
 #highScoreTable th, #highScoreTable td {
-    padding: 10px;
+    padding: 5px;
     border: 1px solid rgba(255, 255, 255, 0.3); /* Transparenter Rand */
 }
 
@@ -387,18 +398,68 @@ header h1 {
 }
 
 .highscore-main {
-    font-size: 1.8em;
+    font-size: 1.6em;
     font-weight: bold;
     text-align: center;
     display: block;
+    margin: 0; /* Entfernt Margin */
+    margin-top: 30px;
+    padding: 0; /* Sicherstellen, dass es kein Padding gibt */
+    line-height: 1; /* Entfernt zusätzlichen vertikalen Abstand */
 }
 
 .highscore-mode {
-    font-size: 0.9em;
+    font-size: 0.8em;
     font-weight: bold;
     text-align: center;
     display: block;
     text-transform: uppercase;
+    margin: 0; /* Entfernt jegliche Margin */
+}
+
+/* Highscore-Tabs */
+.highscore-tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin-bottom: 1px;
+    width: 100%;
+    justify-content: center;
+}
+
+.highscore-tab {
+    flex: 0 0 auto;
+    padding: 6px 10px;
+    margin: 2px 2px;
+    background-color: rgba(0, 128, 255, 0.8); /* Standardfarbe */
+    color: white;
+    border: none;
+    border-radius: 4px; /* Leicht abgerundete Ecken */
+    cursor: pointer;
+    font-size: 2vh;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.highscore-tab:hover {
+    background-color: rgba(0, 102, 204, 0.9); /* Deutlich dunkler beim Hover */
+}
+
+.highscore-tab.active {
+    background-color: rgba(0, 60, 150, 1); /* Tiefdunkles Blau für den aktiven Zustand */
+    color: #FFD700; /* Goldene Schriftfarbe für Kontrast */
+    transform: scale(1.1); /* Leichte Vergrößerung */
+    box-shadow: 0 0 15px rgba(0, 60, 150, 0.8); /* Leuchtender Schatten */
+    border: 1px solid #FFD700; /* Goldener Rand */
+}
+
+/* Optional: Scrollbar verstecken */
+.highscore-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.highscore-tabs {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
 }
 
 .version-display {

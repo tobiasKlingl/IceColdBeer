@@ -47,8 +47,9 @@ export function updateDisplay() {
     currentHoleDisplay.textContent = 'Ziel: Loch ' + gameState.currentTarget;
 
     // Timer aktualisieren
-    const minutes = Math.floor(gameState.elapsedTime / 60).toString().padStart(2, '0');
-    const seconds = (gameState.elapsedTime % 60).toString().padStart(2, '0');
+    let elapsedTimeInSeconds = Math.floor(gameState.elapsedTime / 1000);
+    const minutes = Math.floor(elapsedTimeInSeconds / 60).toString().padStart(2, '0');
+    const seconds = (elapsedTimeInSeconds % 60).toString().padStart(2, '0');
     timerDisplay.textContent = 'Zeit: ' + minutes + ':' + seconds;
 }
 

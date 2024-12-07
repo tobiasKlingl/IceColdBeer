@@ -1,2 +1,7 @@
 # Node.js dependencies
 node_modules/
+firestore.indexes.json
+firestore.rules
+firebase.json
+.firebaserc
+generateIndices.js

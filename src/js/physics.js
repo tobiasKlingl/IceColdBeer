@@ -16,36 +16,42 @@ export function applyPhysics(deltaTime) {
         return; // Physikberechnungen stoppen
     }
 
-    const adjustedWidth = gameState.canvas.width / (window.devicePixelRatio || 1);
-    const adjustedHeight = gameState.canvas.height / (window.devicePixelRatio || 1);
-
-    const gravityInPixels = config.gravity * config.metersToPixels;
+    // const gravityInPixels = config.gravity * config.metersToPhysicalPixels;
+    const gravityInPixels = config.gravity * config.metersToLogicalPixels;
 
     // Aktualisiere die Position der Stangen basierend auf der Eingabe
     updateBars(deltaTime);
 
-    const barSlope = (gameState.bar.rightY - gameState.bar.leftY) / adjustedWidth;
+    const barSlope = (gameState.bar.rightY - gameState.bar.leftY) / config.canvasWidthInLogicalPixels;
     const angle = Math.atan(barSlope); // Neigungswinkel der Stange
 
     const barYAtBallX = gameState.bar.leftY + barSlope * gameState.ball.x;
 
     const isOnBar = (
-        gameState.ball.y + gameState.ball.radius >= barYAtBallX - gameState.bar.height / 2 - 0.5 && // - Math.abs(gameState.bar.leftYSpeed * deltaTime) &&
-        gameState.ball.y + gameState.ball.radius <= barYAtBallX + gameState.bar.height / 2 + 0.5 && // + Math.abs(gameState.bar.rightYSpeed * deltaTime) &&
+        gameState.ball.y + gameState.ball.radius >= barYAtBallX - gameState.bar.height / 2 - 5 &&
+        gameState.ball.y + gameState.ball.radius <= barYAtBallX + gameState.bar.height / 2 + 5 &&
         gameState.ball.x >= 0 &&
-        gameState.ball.x <= adjustedWidth
+        gameState.ball.x <= config.canvasWidthInLogicalPixels
     );
 
-    console.log("deltaTime = " + deltaTime)
-    console.log("gameState.ball.x = " + gameState.ball.x)
-    console.log("gameState.ball.y = " + gameState.ball.y)
-    console.log("gameState.ball.speedX = " + gameState.ball.speedX)
-    console.log("gameState.ball.speedY = " + gameState.ball.speedY)
-    console.log("gameState.bar.leftYspeed = " + gameState.bar.leftYSpeed)
-    console.log("gameState.bar.rightYspeed = " + gameState.bar.rightYSpeed)
+    if (config.withLogging == true) {
+        console.log("config.canvasWidthInLogicalPixels = " + config.canvasWidthInLogicalPixels)
+        console.log("config.canvasWidthInPhysicalPixels = " + config.canvasWidthInPhysicalPixels)
+        console.log("config.metersToPhysicalPixels = " + config.metersToPhysicalPixels)
+        console.log("config.physicalPixelsToMeters = " + config.physicalPixelsToMeters)
+        console.log("config.metersToLogicalPixels = " + config.metersToLogicalPixels)
+        console.log("config.logicalPixelsToMeters = " + config.logicalPixelsToMeters)
+        console.log("deltaTime = " + deltaTime)
+        console.log("gameState.ball.x = " + gameState.ball.x)
+        console.log("gameState.ball.y = " + gameState.ball.y)
+        console.log("gameState.ball.speedX = " + gameState.ball.speedX)
+        console.log("gameState.ball.speedY = " + gameState.ball.speedY)
+        console.log("gameState.bar.leftYspeed = " + gameState.bar.leftYSpeed)
+        console.log("gameState.bar.rightYspeed = " + gameState.bar.rightYSpeed)
+        console.log("angle = " + angle)
+    }
 
     if (isOnBar) {
-        console.log("TEST1")
         // Kugel ist auf der Stange
         // Position der Kugel an die Stange koppeln
         gameState.ball.y = barYAtBallX - gameState.ball.radius - gameState.bar.height / 2;
@@ -58,33 +64,30 @@ export function applyPhysics(deltaTime) {
         const normalForce = gravityInPixels * Math.cos(angle);
         const staticFrictionForce = config.staticFrictionCoefficient * normalForce
 
-        console.log("angle = " + angle)
-        console.log("normalForce = " + normalForce)
-        console.log("gravityForceAlongBar = " + gravityForceAlongBar)
-        console.log("staticFrictionForce: " + staticFrictionForce)
-
+        if (config.withLogging == true) {
+            console.log("normalForce = " + normalForce)
+            console.log("gravityForceAlongBar = " + gravityForceAlongBar)
+            console.log("staticFrictionForce: " + staticFrictionForce)
+        }
 
         // Haftreibung prüfen
         if (Math.abs(gameState.ball.speedX) < 1e-5) { // Kugel steht fast still
-            if (Math.abs(gravityForceAlongBar) <= staticFrictionForce) {
+            if (Math.abs(gravityForceAlongBar) <= Math.abs(staticFrictionForce)) {
                 gameState.ball.speedX = 0;
             } else {
                 // Kugel bewegt sich, kinetische Reibung anwenden
                 const kineticFrictionForce = Math.sign(gameState.ball.speedX) * config.kineticFrictionCoefficient * normalForce;
-                console.log("kineticFrictionFroce = " + kineticFrictionForce)
                 const netForce = gravityForceAlongBar - kineticFrictionForce;
                 gameState.ball.speedX += netForce * deltaTime;
             }
         } else {
              // Kugel bewegt sich bereits, kinetische Reibung anwenden
              const kineticFrictionForce = Math.sign(gameState.ball.speedX) * config.kineticFrictionCoefficient * normalForce;
-             console.log("kineticFrictionFroce = " + kineticFrictionForce)
              const netForce = gravityForceAlongBar - kineticFrictionForce;
              gameState.ball.speedX += netForce * deltaTime;
         }
     } else {
         // Kugel ist nicht auf der Stange
-        console.log("TEST2")
         gameState.ball.speedY += gravityInPixels * deltaTime; // Schwerkraft anwenden
     }
 
@@ -100,8 +103,8 @@ export function applyPhysics(deltaTime) {
         gameState.ball.x = gameState.ball.radius;
         gameState.ball.speedX = - gameState.ball.speedX * (1 - config.wallBounceDamping);
     }
-    if (gameState.ball.x + gameState.ball.radius > adjustedWidth) {
-        gameState.ball.x = adjustedWidth - gameState.ball.radius;
+    if (gameState.ball.x + gameState.ball.radius > config.canvasWidthInLogicalPixels) {
+        gameState.ball.x = config.canvasWidthInLogicalPixels - gameState.ball.radius;
         gameState.ball.speedX = -gameState.ball.speedX * (1 - config.wallBounceDamping);
     }
 
@@ -121,7 +124,7 @@ export function applyPhysics(deltaTime) {
     }
 
     // Prüfen, ob der Ball aus dem Bildschirm fällt
-    if (gameState.ball.y - gameState.ball.radius > adjustedHeight) {
+    if (gameState.ball.y - gameState.ball.radius > config.canvasHeightInLogicalPixels) {
         handleBallOutOfBounds();
         return;
     }
@@ -133,20 +136,27 @@ export function applyPhysics(deltaTime) {
  */
 function applyAirResistance(ball, deltaTime) {
     const speed = Math.sqrt(ball.speedX ** 2 + ball.speedY ** 2); // Betrag der Geschwindigkeit in Pixeln/s
-    const speedInMeters = speed * config.pixelsToMeters; // Geschwindigkeit in m/s
+    //const speedInMeters = speed * config.physicalPixelsToMeters; // Geschwindigkeit in m/s
+    const speedInMeters = speed * config.logicalPixelsToMeters; // Geschwindigkeit in m/s
 
     if (speed < 1e-5) return; // Kein Luftwiderstand, wenn keine Bewegung
 
     // Luftwiderstandskraft (SI-Einheiten)
     const dragForce = 0.5 * config.airDensity * config.dragCoefficient * Math.PI *
-    Math.pow(ball.radius * config.pixelsToMeters, 2) * Math.pow(speedInMeters, 2);
+    //Math.pow(ball.radius * config.physicalPixelsToMeters, 2) * Math.pow(speedInMeters, 2);
+    Math.pow(ball.radius * config.logicalPixelsToMeters, 2) * Math.pow(speedInMeters, 2);
 
     // Kraft in SI -> Beschleunigung in SI -> zurück in Pixel
     const dragAcceleration = dragForce / config.ballMass;
-    const dragAccelerationInPixels = dragAcceleration * config.metersToPixels;
+    const dragAccelerationInPixels = dragAcceleration * config.metersToLogicalPixels;
 
     const dragX = (ball.speedX / speed) * dragAccelerationInPixels;
     const dragY = (ball.speedY / speed) * dragAccelerationInPixels;
+
+    if (config.withLogging == true) {
+        console.log("dragX = " + dragX)
+        console.log("dragY = " + dragY)
+    }
 
     ball.speedX -= dragX * deltaTime;
     ball.speedY -= dragY * deltaTime;
@@ -180,6 +190,7 @@ function handleCorrectHole() {
     ];
 
     gameState.timeLastHole = gameState.elapsedTime;
+    gameState.times[`time_${gameState.currentTarget}`] = gameState.elapsedTime;
 
     // Lochbewegung stoppen
     if (gameState.mode === 'expert') {

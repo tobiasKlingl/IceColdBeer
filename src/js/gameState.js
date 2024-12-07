@@ -5,7 +5,7 @@
  * Verwalten des Spielzustands und der Initialisierung.
  */
 
-import { config, estimateDisplayWidthInMeters } from './config.js';
+import { config } from './config.js';
 import { holesData } from '../data/holesData.js';
 import { holesDataOriginal } from '../data/holesData_original.js';
 import { setupInputHandlers } from './input.js';
@@ -35,9 +35,23 @@ export const gameState = {
         rightYSpeed: 0   // Geschwindigkeit der rechten Seite
     },
     startTime: null,       // Startzeit des Spiels
-    elapsedTime: 0,        // Verstrichene Zeit
-    timeLastHole: 0,       // Zeit zu der der letzte Punkt gescored wurde
+    elapsedTime: 0,        // Verstrichene Zeit in ms
+    timeLastHole: 0,       // Zeit zu der der letzte Punkt gescored wurde in ms
+    times: {
+        time_0: -1,
+        time_1: -1,
+        time_2: -1,
+        time_3: -1,
+        time_4: -1,
+        time_5: -1,
+        time_6: -1,
+        time_7: -1,
+        time_8: -1,
+        time_9: -1,
+        time_10: -1,
+    },
     timerInterval: null,   // Interval-ID für den Timer
+    gameEndTimeout: null,  // Timeout-ID für das automatische Beenden des Spiels
     lives: config.maxLives, // Aktuelle Leben
     currentTarget: 1,      // Aktuelles Ziel-Loch
     gameOver: false,       // Spielstatus
@@ -90,21 +104,54 @@ export function resetTimer() {
     clearInterval(gameState.timerInterval);
     gameState.startTime = Date.now();
     gameState.elapsedTime = 0;
-    gameState.timerInterval = setInterval(function() {
-        gameState.elapsedTime = Math.floor((Date.now() - gameState.startTime) / 1000);
+    gameState.timerInterval = setInterval(function () {
+        // Verstrichene Zeit in Millisekunden aktualisieren
+        gameState.elapsedTime = Date.now() - gameState.startTime;
+
+        // Anzeige aktualisieren (falls nötig, in Sekunden umwandeln)
         updateDisplay();
     }, config.timerUpdateInterval);
+
+    // Timeout für das automatische Beenden des Spiels nach 60 Minuten
+    gameState.gameEndTimeout = setTimeout(function () {
+        Swal.fire({
+            title: 'Spielzeit abgelaufen!',
+            text: 'Du hast die maximale Spielzeit von 60 Minuten erreicht.',
+            icon: 'info',
+            confirmButtonText: 'Zurück zum Start',
+            background: '#2c2c2c',
+            color: '#ffffff',
+        }).then(() => {
+            returnToModeSelectionScreen();
+        });
+    }, config.maxGameDuration);
+}
+
+/**
+ * Funktion, um zum Startbildschirm zurückzukehren.
+ */
+function returnToModeSelectionScreen() {
+    // Sichtbarkeit der verschiedenen Abschnitte anpassen
+    document.getElementById('modeSelectionScreen').style.display = 'block';
+    document.querySelector('header').style.display = 'none';
+    document.querySelector('.game-container').style.display = 'none';
+    document.querySelector('.controls').style.display = 'none';
+    document.querySelector('.game-info').style.display = 'none';
+    document.getElementById('endScreen').style.display = 'none';
+
+    // Spielvariablen zurücksetzen
+    gameState.gameOver = true;
+    resetGame();
+    clearInterval(gameState.timerInterval); // Timer beenden
+    clearTimeout(gameState.gameEndTimeout);          // Timeout löschen, falls gesetzt
 }
 
 /**
  * Funktion zur Initialisierung von Stange und Kugel.
  */
 function initializeBarAndBall() {
-    const adjustedWidth = gameState.canvas.width / (window.devicePixelRatio || 1);
-    const adjustedHeight = gameState.canvas.height / (window.devicePixelRatio || 1);
-
     // Stange initialisieren
-    const barStartY = adjustedHeight * config.barStartYPercentage;
+    const barStartY = config.canvasHeightInLogicalPixels * config.barStartYPercentage;
     gameState.bar.leftY = barStartY;
     gameState.bar.rightY = barStartY;
     gameState.bar.leftYSpeed = 0;  // Initialisieren
@@ -115,7 +162,7 @@ function initializeBarAndBall() {
     // Kugel initialisieren
     gameState.ball.radius = config.ballRadius;
     gameState.ball.color = config.ballColor;
-    gameState.ball.x = adjustedWidth * config.ballStartXFraction; // Startet bei 85% der Breite
+    gameState.ball.x = config.canvasWidthInLogicalPixels * config.ballStartXFraction;
     gameState.ball.y = gameState.bar.leftY - gameState.ball.radius - gameState.bar.height / 2;
     gameState.ball.speedX = 0;
     gameState.ball.speedY = 0;
@@ -129,13 +176,10 @@ function initializeBarAndBall() {
  */
 function scaleAndPositionHoles() {
     gameState.holes.forEach(hole => {
-        const adjustedWidth = gameState.canvas.width / (window.devicePixelRatio || 1);
-        const adjustedHeight = gameState.canvas.height / (window.devicePixelRatio || 1);
+        hole.actualX = hole.x * config.canvasWidthInLogicalPixels;
+        hole.actualY = hole.y * config.canvasHeightInLogicalPixels;
 
-        hole.actualX = hole.x * adjustedWidth;
-        const deltaY = config.deltaYFraction * adjustedHeight;
-        hole.actualY = hole.y * adjustedHeight + deltaY;
-        const scalingFactor = Math.min(adjustedWidth, adjustedHeight);
+        const scalingFactor = Math.min(config.canvasWidthInLogicalPixels, config.canvasHeightInLogicalPixels);
         hole.actualRadius = hole.radius * scalingFactor;
     });
 }
@@ -154,21 +198,6 @@ export function initializeGame() {
     // Canvas-Größe einstellen
     resizeCanvas();
 
-    // Berechnung der physischen Canvas-Breite
-    const displayWidthInMeters = estimateDisplayWidthInMeters(); // Gesamte physische Breite des Displays
-    const logicalDisplayWidth = window.innerWidth; // Gesamte logische Breite des Displays in Pixeln
-
-    const canvasWidth = gameState.canvas.width / (window.devicePixelRatio || 1); // Canvas ("Spielfeld")-Breite in Pixeln
-    const pixelsPerMeter = logicalDisplayWidth / displayWidthInMeters;
-
-    // Berechnung der Canvas-Breite in Metern (Verhältnis zur Displaybreite)
-    const canvasWidthInMeters = canvasWidth / pixelsPerMeter;
-
-    // Dynamische Skalierung berechnen
-    config.canvasWidthInMeters = canvasWidthInMeters;
-    config.metersToPixels = canvasWidth / canvasWidthInMeters;
-    config.pixelsToMeters = 1 / config.metersToPixels;
-
     // UI initialisieren
     initializeUI();
 
@@ -180,11 +209,6 @@ export function initializeGame() {
 
     // Eingabe-Handler einrichten
     setupInputHandlers();
-
-    console.log(`Physische Breite (geschätzt): ${canvasWidthInMeters} m`);
-    console.log(`Meters to Pixels: ${config.metersToPixels}`);
-    console.log(`Pixels to Meters: ${config.pixelsToMeters}`);
-
 
     // Fenstergrößenänderung behandeln
     window.addEventListener('resize', function() {
@@ -204,29 +228,42 @@ export function initializeGame() {
  * Funktion zum Anpassen der Canvas-Größe.
  */
 function resizeCanvas() {
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth; // Höhe des Fensters in logischen Pixeln. Fenster = Bereich des Bildschirms, der von der Webseite sicherbar im Browser angezeigt wird.
+    const viewportHeight = window.innerHeight; // Breite des Fensters in logischen Pixeln
     const headerHeight = viewportHeight * (parseFloat(config.headerHeight) / 100);
 
     const availableHeight = viewportHeight - headerHeight;
 
-    const canvasHeight = availableHeight * config.canvasHeightPercentage;
-    const canvasWidth = viewportWidth * 0.95; // 95% der verfügbaren Breite
+    const canvasWidthInLogicalPixels = viewportWidth * 0.95; // Die Breite, die für das Spielfeld vorgesehen ist (in logischen Pixeln).
+    const canvasHeightInLogicalPixels = availableHeight * config.canvasHeightPercentage; // Die Höhe, die für das Spielfeld vorgesehen ist (in logischen Pixeln).
 
     // Device Pixel Ratio
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = window.devicePixelRatio || 1; // Verhältnis aus logischen und physischen Pixeln
 
     // Canvas-Größe in Pixeln setzen
-    gameState.canvas.width = canvasWidth * dpr;
-    gameState.canvas.height = canvasHeight * dpr;
+    gameState.canvas.width = canvasWidthInLogicalPixels * dpr; // Die Breite des Spielfelds in physischen Pixeln.
+    gameState.canvas.height = canvasHeightInLogicalPixels * dpr; // Die Höhe des Spielfelds in physischen Pixeln.
 
     // CSS-Größe des Canvas setzen
-    gameState.canvas.style.width = `${canvasWidth}px`;
-    gameState.canvas.style.height = `${canvasHeight}px`;
+    gameState.canvas.style.width = `${canvasWidthInLogicalPixels}px`;
+    gameState.canvas.style.height = `${canvasHeightInLogicalPixels}px`;
 
     // Kontext skalieren
     gameState.ctx.setTransform(1, 0, 0, 1, 0, 0);
     gameState.ctx.scale(dpr, dpr);
+
+    // Breiten und Höhen in `config` speichern
+    config.canvasWidthInLogicalPixels = canvasWidthInLogicalPixels; // Logische Breite
+    config.canvasHeightInLogicalPixels = canvasHeightInLogicalPixels; // Logische Höhe
+
+    config.canvasWidthInPhysicalPixels = gameState.canvas.width; // Physische Breite
+    config.canvasHeightInPhysicalPixels = gameState.canvas.height; // Physische Höhe
+
+    // Dynamische Skalierung berechnen
+    config.metersToLogicalPixels = config.canvasWidthInLogicalPixels / config.realGameWidthInMeters; // Logische Pixel pro Meter
+    config.logicalPixelsToMeters = config.realGameWidthInMeters / config.canvasWidthInLogicalPixels; // Meter pro logische Pixel
+    config.metersToPhysicalPixels = config.canvasWidthInPhysicalPixels / config.realGameWidthInMeters; // Physische Pixel pro Meter
+    config.physicalPixelsToMeters = config.realGameWidthInMeters / config.canvasWidthInPhysicalPixels; // Meter pro physische Pixel
 }
 
 /**
