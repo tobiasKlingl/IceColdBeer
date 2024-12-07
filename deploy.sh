@@ -2,7 +2,8 @@
 
 # 1. Sicherstellen dass man im master branch ist
 CURRENT_BRANCH=$(git branch --show-current)
-if [ "CURRENT_BRANCH" != "master" ]; then
+echo $CURRENT_BRANCH
+if [ "$CURRENT_BRANCH" != "master" ]; then
     echo "Error: Das Skript darf nur im Master-Branch ausgeführt werden."
     exit 1
 fi
