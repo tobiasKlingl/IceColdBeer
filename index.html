@@ -38,6 +38,8 @@
     <div class="game-container" style="display: none;">
         <!-- Canvas-Element für das Spiel -->
         <canvas id="gameCanvas"></canvas>
+         <!-- Message Overlay innerhalb des Spielcontainers -->
+         <div id="messageOverlay" class="message-overlay" style="display: none;"></div>
     </div>
 
     <!-- Steuerungselemente -->
@@ -80,10 +82,10 @@
     </div>
 
     <!-- Endbildschirm -->
-    <div id="endScreen" style="display: none;">
+    <div id="endScreen">
         <div id="endMessage"></div>
         <!-- Highscore-Eingabe -->
-        <div id="highScoreInput" style="display: none;">
+        <div id="highScoreInput">
             <label for="playerName">Name eingeben:</label>
             <input type="text" id="playerName" maxlength="10">
             <button id="submitScoreButton">Bestätigen</button>
@@ -91,8 +93,7 @@
         <!-- Highscore-Liste -->
         <div id="highScoreList">
             <h2 id="highScoreTitle">
-                <span class="highscore-main">Highscore 🏆</span><br>
-                <span class="highscore-mode">Beginner 🐣</span>
+                <span class="highscore-main">Highscore 🏆</span>
             </h2>
 
             <!-- Neue Tab-Navigation hinzufügen -->
@@ -126,18 +127,10 @@
                     <!-- Zeilen werden hier dynamisch eingefügt -->
                 </tbody>
             </table>
-            <!-- Swipe-Buttons in der swipeHint-Anzeige platzieren -->
-            <p id="swipeHint">
-                <button id="swipeLeftButton" class="swipe-button">⇐</button>
-                <button id="swipeRightButton" class="swipe-button">⇒</button>
-            </p>
         </div>
         <!-- Neues Spiel Button -->
         <button id="restartButton">Neues Spiel 🔄</button>
-        <!-- Highscores zurücksetzen Button -->
-        <button id="resetHighscoresButton">Highscores zurücksetzen</button>
     </div>
-
 
     <div class="version-display" style="display: block;">Version: {{ VERSION_TAG }}</div>
 

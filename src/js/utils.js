@@ -16,9 +16,6 @@ export function setCSSVariables() {
     root.style.setProperty('--config-header-height', config.headerHeight);
     root.style.setProperty('--config-header-opacity', config.headerBackgroundOpacity);
     root.style.setProperty('--config-element-opacity', config.elementBackgroundOpacity);
-    root.style.setProperty('--config-button-size', config.buttonSize);
-    root.style.setProperty('--config-restart-button-size', config.restartButtonSize);
-    root.style.setProperty('--config-button-font-size', config.buttonFontSize);
     root.style.setProperty('--config-playfield-border-width', config.playfieldBorderWidth);
     root.style.setProperty('--config-playfield-border-color', config.colors.playfieldBorderColor);
     root.style.setProperty('--config-header-background-color', config.colors.headerBackgroundColor);

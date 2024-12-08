@@ -9,7 +9,7 @@ export const config = {
     withLogging: false,
 
     // Anzeigeeinstellungen
-    showNumbersOnMissHoles: false, // Zeige Nummern auf Miss-Löchern
+    showNumbersOnMissHoles: true, // Zeige Nummern auf Miss-Löchern
 
     // Maximale Spielzeit
     maxGameDuration: 60 * 60 * 1000, // 60 Minuten in Millisekunden
@@ -29,12 +29,13 @@ export const config = {
     elementBackgroundOpacity: 0.7,
 
     // Ball-Eigenschaften
-    ballRadius: 6, // Radius der Kugel
-    ballStartXFraction: 0.9, // Startposition relativ zur Breite
+    ballRadius: 0.017, // Radius der Kugel relativen Breite des Spielfeldes (0.8cm/47cm)
+    ballStartXFraction: 0.85, // Startposition relativ zur Breite
     ballColor: '#494949',
 
     // Stangen-Eigenschaften
     barHeight: 5, // Höhe der Stange
+    barWidth: 90, // Breite der Stange
     barColor: 'rgba(255, 165, 0, 0.8)',
     baseBarSpeed: 10, // Grundgeschwindigkeit der Stange
     barSpeedDampingFactor: 1.0, // Controls the deceleration rate (0 < dampingFactor < 1)
@@ -47,9 +48,10 @@ export const config = {
     ballMass: 0.016, // Masse des Balls (kg)
 
     // Reibung
-    staticFrictionCoefficient: 0.013, // Summe aus Widerstand gegen Rollen (0.005) + Haftreibung and der Wand (0.008)
-    kineticFrictionCoefficient: 0.013, // Rollreibungskoeffizient (typisch: mu_r = 0.005) + Gleichreibung durch schräges Anlehen an die Wand (mu_H = 0.2-0.3 für lackiertes Holz, Winkel ungefähr alpha = 88grad => mu_g = mu_H*cos(alpha) = 0.008)
-    wallBounceDamping: 0.75, // Energieverlust bei Kollision mit Wänden
+    staticFrictionCoefficient: 0.080, // klassische Haftreibung (typisch mu_h = 0.2, mit Öl 0.05-0.1) + Gleichreibung durch schräges Anlehnen an die Wand (mu_H = 0.1, Winkel ungefähr alpha = 87grad => mu_g = mu_H*cos(alpha) = 0.005)
+    kineticFrictionCoefficient: 0.055, // Gleitreibungskoeffizient (typisch: mu_g = 0.1, mit Öl 0.02-0.05) + Gleichreibung durch schräges Anlehnen an die Wand
+    rotationFrictionCoefficient: 0.007, // Rollreibungskoeffizient (typisch: mu_r = 0.002, Öl hat kaum Einfluß) + Gleichreibung durch schräges Anlehnen an die Wand
+    wallBounceDamping: 0.66, // Energieverlust bei Kollision mit Wänden
 
     // Loch-Einstellungen
     holeOverlapThresholdMiss: 0.99, // Schwellenwert für Miss-Löcher
@@ -76,12 +78,6 @@ export const config = {
 
     // Lebenssystem
     maxLives: 3, // Maximale Anzahl an Leben
-
-    // Button-Einstellungen
-    buttonSize: '10.4vh', // Größe der Buttons
-    buttonFontSize: '4.5vh',
-    restartButtonSize: '16vh',
-    arrowButtonMargin: '5px', // Margin für Buttons
 
     // Timer-Einstellungen
     timerUpdateInterval: 10, // Aktualisierungsintervall des Timers in ms
@@ -112,23 +108,23 @@ export const config = {
     gameModes: {
         'beginner': { 
             title: 'Beginner',
-            highscoreSheetName: 'highscores_beginner',
+            highscoreSheetName: 'highscores_beginner_v2',
             emoji: '🐣' // Symbol für Anfänger
         }, 
         'advanced': { 
             title: 'Fortgeschritten',
-            highscoreSheetName: 'highscores_advanced',
+            highscoreSheetName: 'highscores_advanced_v2',
             emoji: '🚀' // Symbol für Fortgeschrittene
         }, 
         'expert': { 
             title: 'Experte',
-            highscoreSheetName: 'highscores_expert',
+            highscoreSheetName: 'highscores_expert_v2',
             emoji: '💀' // Symbol für Experten
         },
     },
 
      // Physische Breite des Spiels in Metern (realer Wert des originalen Spiels)
-     realGameWidthInMeters: 0.60, // Beispiel: 60 cm Breite des realen Spiels
+     realGameWidthInMeters: 0.47, // Beispiel: 64 cm Breite des Apparates. Spielfeld ungefähr 11/15 davon.
 
      // Dynamische Werte (während Laufzeit gesetzt)
      canvasWidthInLogicalPixels: null, // Logische Breite des Canvas

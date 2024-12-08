@@ -56,28 +56,6 @@ function changeGameMode(direction) {
     loadHighScores(currentTab);
 }
 
-
-/* Deklariere die Swipe-Buttons einmal außerhalb der Funktion */
-const swipeLeftButton = document.getElementById('swipeLeftButton');
-const swipeRightButton = document.getElementById('swipeRightButton');
-
-/* Event Listener für Swipe Buttons hinzufügen */
-if (swipeLeftButton && swipeRightButton) {
-    swipeLeftButton.addEventListener('click', () => {
-        // Wechsel zum nächsten Game Modus (rechts)
-        //currentModeIndex = (currentModeIndex + 1) % config.gameModeKeys.length;
-        //gameState.viewMode = config.gameModeKeys[currentModeIndex];
-        changeGameMode(-1);
-    });
-
-    swipeRightButton.addEventListener('click', () => {
-        // Wechsel zum nächsten Game Modus (links)
-        //currentModeIndex = (currentModeIndex === 0) ? config.gameModeKeys.length - 1 : currentModeIndex - 1;
-        //gameState.viewMode = config.gameModeKeys[currentModeIndex];
-        changeGameMode(+1);
-    });
-}
-
 /* Swipe-Gesten auf dem Highscore-Bereich erkennen */
 const highScoreList = document.getElementById('highScoreList');
 
@@ -126,7 +104,6 @@ export async function showEndScreen(won, directAccess = false) {
     const playerNameInput = document.getElementById('playerName');
     const submitScoreButton = document.getElementById('submitScoreButton');
     const restartButton = document.getElementById('restartButton');
-    const resetHighscoresButton = document.getElementById('resetHighscoresButton');
     const highScoreTitle = document.getElementById('highScoreTitle');
 
     // Bestimme den Modus für die Highscore-Anzeige
@@ -135,9 +112,27 @@ export async function showEndScreen(won, directAccess = false) {
 
     // Setze den Titel in zwei Zeilen
     highScoreTitle.innerHTML = `
-    <span class="highscore-main">Highscore 🏆</span><br>
-    <span class="highscore-mode">${modeConfig.title.toUpperCase()} ${modeConfig.emoji}</span>
+    <span class="highscore-main">Highscore 🏆</span>
+    <div class="highscore-header">
+        <button id="swipeLeftButton" class="swipe-button">⇐</button>
+        <span class="highscore-mode">${modeConfig.title.toUpperCase()} ${modeConfig.emoji}</span>
+        <button id="swipeRightButton" class="swipe-button">⇒</button>
+    </div>
     `;
+
+    // Nach dem Setzen von highScoreTitle.innerHTML
+    const swipeLeftButton = document.getElementById('swipeLeftButton');
+    const swipeRightButton = document.getElementById('swipeRightButton');
+
+    if (swipeLeftButton && swipeRightButton) {
+        swipeLeftButton.addEventListener('click', () => {
+            changeGameMode(-1);
+        });
+
+        swipeRightButton.addEventListener('click', () => {
+            changeGameMode(+1);
+        });
+    }
 
     // Endscreen anzeigen und Timer stoppen
     endScreen.style.display = 'flex';
@@ -146,7 +141,7 @@ export async function showEndScreen(won, directAccess = false) {
 
     if (directAccess) {
         endMessage.textContent = '';
-        highScoreInput.style.display = 'none';
+        highScoreInput.classList.remove('active');
     } else {
         // Nachricht basierend auf dem Spielstatus anzeigen
         if (won) {
@@ -175,16 +170,7 @@ export async function showEndScreen(won, directAccess = false) {
         level: parseInt(gameState.currentTarget - 1, 10),
         lives: parseInt(gameState.lives, 10),
         time: parseInt(gameState.timeLastHole, 10),
-        time_1: gameState.times.time_1,
-        time_2: gameState.times.time_2,
-        time_3: gameState.times.time_3,
-        time_4: gameState.times.time_4,
-        time_5: gameState.times.time_5,
-        time_6: gameState.times.time_6,
-        time_7: gameState.times.time_7,
-        time_8: gameState.times.time_8,
-        time_9: gameState.times.time_9,
-        time_10: gameState.times.time_10,
+        level_info: gameState.level_info,
         date: Timestamp.now()
     };
     
@@ -206,7 +192,7 @@ export async function showEndScreen(won, directAccess = false) {
 
         if (!directAccess) {
             // Eingabefeld für Namen anzeigen
-            highScoreInput.style.display = 'flex';
+            highScoreInput.classList.add('active');
 
             // Vorausfüllen des Namensfeldes mit dem gespeicherten Namen, falls vorhanden
             const cachedName = localStorage.getItem('playerName');
@@ -248,44 +234,51 @@ export async function showEndScreen(won, directAccess = false) {
                         existingScore.time = Number(existingScore.time);
                         existingScore.lives = Number(existingScore.lives);
 
-                        const updateData = {};
                         const updatedLevels = [];
 
-                        // 1. Aktualisiere immer die time_n Felder, wenn der neue Wert besser ist
-                        for (let i = 1; i <= score.level; i++) {
-                            const newTime = score[`time_${i}`];
-                            const existingTime = existingScore[`time_${i}`];
+                        const newScoreIsBetter = isNewScoreBetter(existingScore, score);
 
-                            // Aktualisiere nur, wenn der neue Time-Wert besser ist oder das bestehende Zeitfeld leer ist
-                            if (
-                                newTime !== undefined &&
-                                newTime >= 0 &&
-                                (
-                                    existingTime === null ||
-                                    existingTime === undefined ||
-                                    existingTime < 0 ||
-                                    newTime < existingTime
-                                )
-                            ){
-                                updateData[`time_${i}`] = newTime;
-                                updatedLevels.push(i); // Füge das aktualisierte Level zum Array hinzu
+                        // 1. Aktualisiere immer die Array Felder von Level n, wenn der neue Wert besser ist
+
+                        for (const info of score.level_info) {
+                            // Finde das entsprechende level_info Objekt im bestehenden Score
+                            const existingLevelInfoIndex = existingScore.level_info.findIndex(existingInfo => existingInfo.level === info.level);
+                            console.log("existingLevelInfoIndex = " + existingLevelInfoIndex);
+                            if (existingLevelInfoIndex !== -1) {
+                                const existingInfo = existingScore.level_info[existingLevelInfoIndex];
+                                const existingTime = existingInfo.time;
+                                // Aktualisiere nur, wenn der neue Time-Wert besser ist
+                                if (info.time < existingTime) {
+                                    existingScore.level_info[existingLevelInfoIndex].time = info.time;
+                                    existingScore.level_info[existingLevelInfoIndex].lives = info.lives;
+                                    existingScore.level_info[existingLevelInfoIndex].date = info.date;
+                                    updatedLevels.push(info.level); // Füge das aktualisierte Level zum Array hinzu
+                                }
+                            } else {
+                                // Wenn das Level nicht existiert, füge es hinzu
+                                existingScore.level_info.push({
+                                    level: info.level,
+                                    time: info.time,
+                                    lives: info.lives,
+                                    date: info.date
+                                });
                             }
                         }
 
                         // 2. Zusätzlich, wenn der gesamte Score besser ist, aktualisiere lives, time und date
-                        if (isNewScoreBetter(existingScore, score)) {
+                        if (newScoreIsBetter) {
                             // Erstelle ein Update-Objekt mit den Feldern, die aktualisiert werden sollen
-                            updateData.level = score.level;
-                            updateData.lives = score.lives;
-                            updateData.time = score.time;
-                            updateData.date = score.date;
+                            existingScore.level = score.level;
+                            existingScore.lives = score.lives;
+                            existingScore.time = score.time;
+                            existingScore.date = score.date;
                         }
                         
                         // 3. Überprüfe, ob es Felder gibt, die aktualisiert werden müssen
-                        if (Object.keys(updateData).length > 0) {
-                            await setDoc(existingDoc.ref, updateData, { merge: true });
+                        if (updatedLevels.length > 0 || newScoreIsBetter) {
+                            await setDoc(existingDoc.ref, existingScore, { merge: true });
 
-                            if (isNewScoreBetter(existingScore, score)) {
+                            if (newScoreIsBetter) {
                                 let displayTime = formatTime(score.time);
                                 messages.push(`🥇 Neuer Highscore! Level ${score.level} in ${displayTime}`);
                             } else {
@@ -329,7 +322,7 @@ export async function showEndScreen(won, directAccess = false) {
                     });
 
                     // Blende das Eingabefeld nach der Bestätigung aus
-                    highScoreInput.style.display = 'none';
+                    highScoreInput.classList.remove('active');;
 
                     // Speichere den Namen im localStorage
                     localStorage.setItem('playerName', playerName);
@@ -360,7 +353,7 @@ export async function showEndScreen(won, directAccess = false) {
         resetTimer(); // Timer zurücksetzen beim Neustart
         updateDisplay();
         playerNameInput.value = '';
-        highScoreInput.style.display = 'none';
+        highScoreInput.classList.remove('active');;
 
         // Spiel-Elemente anzeigen
         document.querySelector('header').style.display = 'flex';
@@ -398,15 +391,37 @@ function displayHighScores(highScores, tab = 'overall') {
     // Passe den Titel an
     if (tab === 'overall') {
         highScoreTitle.innerHTML = `
-            <span class="highscore-main">Highscore 🏆</span><br>
+        <span class="highscore-main">Highscore 🏆</span>
+        <div class="highscore-header">
+            <button id="swipeLeftButton" class="swipe-button">⇐</button>
             <span class="highscore-mode">${config.gameModes[gameState.viewMode].title.toUpperCase()} ${config.gameModes[gameState.viewMode].emoji}</span>
+            <button id="swipeRightButton" class="swipe-button">⇒</button>
+        </div>
         `;
     } else {
         highScoreTitle.innerHTML = `
-            <span class="highscore-main">Highscore 🏆</span><br>
-            <span class="highscore-mode">Level ${tab} ${config.gameModes[gameState.viewMode].emoji}</span>
+            <span class="highscore-main">Highscore 🏆</span>
+            <div class="highscore-header">
+                <button id="swipeLeftButton" class="swipe-button">⇐</button>
+                <span class="highscore-mode">Level ${tab} ${config.gameModes[gameState.viewMode].emoji}</span>
+                <button id="swipeRightButton" class="swipe-button">⇒</button>
+            </div>
         `;
     }
+
+     // Nach dem Setzen von highScoreTitle.innerHTML
+     const swipeLeftButton = document.getElementById('swipeLeftButton');
+     const swipeRightButton = document.getElementById('swipeRightButton');
+
+     if (swipeLeftButton && swipeRightButton) {
+         swipeLeftButton.addEventListener('click', () => {
+             changeGameMode(-1);
+         });
+
+         swipeRightButton.addEventListener('click', () => {
+             changeGameMode(+1);
+         });
+     }
 
     // Sortiere die Highscores
     if (tab === 'overall') {
@@ -421,15 +436,14 @@ function displayHighScores(highScores, tab = 'overall') {
         });
     } else {
         const level = parseInt(tab, 10);
-        highScores = highScores.filter(score => score.level >= level);
         highScores.sort((a, b) => {
-            const timeA = a[`time_${level}`] || Infinity;
-            const timeB = b[`time_${level}`] || Infinity;
-
-            if (timeA !== timeB) {
-                return timeA - timeB; // Weniger Zeit ist besser
+            // Zugriff auf das level_info Element mit dem spezifischen Level
+            const levelInfoA = a.level_info.find(info => info.level === level);
+            const levelInfoB = b.level_info.find(info => info.level === level);
+            if (levelInfoA.time !== levelInfoB.time) {
+                return levelInfoA.time - levelInfoB.time; // Weniger Zeit ist besser
             } else {
-                return b.lives - a.lives; // Mehr Leben ist besser
+                return levelInfoB.lives - levelInfoA.lives; // Mehr Leben ist besser
             }
         });
     }
@@ -442,28 +456,33 @@ function displayHighScores(highScores, tab = 'overall') {
 
     // Highscores einfügen
     highScores.forEach((score, index) => {
-        const formattedDate = score.date.toDate().toLocaleDateString(); // Datum formatieren
-        let level = score.level;
-        let displayTime = formatTime(score.time);
+        let level;
+        let displayTime;
+        let lives;
+        let formattedDate;
 
-        if (tab !== 'overall') {
+        if (tab == 'overall') {
+            level = score.level;
+            displayTime = formatTime(score.time);
+            lives = score.lives;
+            formattedDate = score.date.toDate().toLocaleDateString(); // Datum formatieren
+        } else {
             level = parseInt(tab, 10);
-            const timeAtLevel = score[`time_${level}`];
-            if (timeAtLevel !== undefined && timeAtLevel >= 0) {
-                displayTime = formatTime(timeAtLevel);
-            } else {
-                displayTime = 'N/A';
-            }
+            // Zugriff auf das level_info Element mit dem spezifischen Level
+            const levelInfo = score.level_info.find(info => info.level === level);
+            displayTime = formatTime(levelInfo.time);
+            lives = levelInfo.lives;
+            formattedDate = levelInfo.date.toDate().toLocaleDateString();
         }
 
         // Erstelle eine neue Tabellenzeile
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td>${index + 1}</td>
+            <td>${index + 1}.</td>
             <td>${capitalizeName(score.name)}</td>
             <td>${level}</td>
             <td>${displayTime}</td>
-            <td>${score.lives}</td>
+            <td>${lives}</td>
             <td>${formattedDate}</td>
         `;
         highScoresTableBody.appendChild(tr);
@@ -478,9 +497,9 @@ function formatTime(milliseconds) {
     const totalSeconds = milliseconds / 1000; // Sekunden als Dezimalzahl
     const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
     const seconds = Math.floor(totalSeconds % 60).toString().padStart(2, '0');
-    const hundredths = Math.floor((milliseconds % 1000) / 10).toString().padStart(2, '0');
+    const thousandths  = Math.floor((milliseconds % 1000)).toString().padStart(3, '0');
 
-    return `${minutes}:${seconds}.${hundredths}`;
+    return `${minutes}:${seconds}.${thousandths }`;
 }
 
 /**
@@ -505,9 +524,7 @@ async function loadHighScores(tab = 'overall') {
         q = query(
             highscoreCollection,
             where('level', '>=', level),
-            orderBy('level', 'desc'), // Hinzugefügt
-            orderBy(`time_${level}`, 'asc'),
-            orderBy('lives', 'desc'),
+            orderBy('level', 'desc'),
             limit(10)
         );
         console.log(`Executing query for Level ${level} high scores`);

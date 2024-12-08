@@ -124,7 +124,7 @@ header h1 {
     margin: var(--playfield-top-margin) auto var(--playfield-bottom-margin);
     background-color: rgba(255, 255, 255, var(--element-opacity));
     border-radius: 10px;
-    overflow: hidden;
+    overflow: visible;
     border: var(--playfield-border-width) solid var(--playfield-border-color);
 }
 
@@ -143,17 +143,14 @@ header h1 {
     color: #fff;
     display: none;
     flex-direction: column;
-    justify-content: flex-start; /*center; */
+    justify-content: flex-start;
     align-items: center;
     z-index: 1000;
     overflow-y: auto;
 }
 
 #endMessage {
-    /*position: absolute; /* Ermöglicht die genaue Positionierung */
-    /*top: 20%; Abstand vom oberen Rand */
     left: 50%; /* Zentrieren horizontal */
-    /*transform: translateX(-50%); /* Exakte Zentrierung */
     color: #fff; /* Textfarbe */
     text-align: center; /* Zentrierter Text */
     font-size: 1.25em; /* Schriftgröße */
@@ -164,27 +161,13 @@ header h1 {
 }
 
 #highScoreInput {
-    display: flex;
+    display: none;
     flex-direction: column;
     align-items: center;
 }
 
-#highScoreHeader {
-    font-weight: bold;
-    text-align: center;
-    margin-bottom: 10px;
-    font-size: 1.2em;
-    display: grid;
-    grid-template-columns: 1fr 2fr 1fr 1fr 1fr 2fr; /* Spalten für: #, Name, Level, Leben, Zeit, Datum */
-    gap: 10px;
-}
-
-
-#highScoreItems li {
-    display: grid;
-    grid-template-columns: 1fr 2fr 1fr 1fr 1fr 2fr;
-    gap: 10px;
-    text-align: center;
+#highScoreInput.active {
+    display: flex; /* Nur sichtbar, wenn 'active'-Klasse vorhanden */
 }
 
 #playerName {
@@ -210,22 +193,17 @@ header h1 {
 }
 
 #restartButton {
-    padding: 11px 15px;
+    padding: 11px 55px;
     background-color: var(--button-color);
+    border-color: rgba(250, 250, 250, 0.5);
     color: white;
-    border: none;
     border-radius: 20px;
-    cursor: pointer;
     font-size: 2.5vh;
     transition: background-color 0.3s ease;
     width: 70%;
 }
 
-#resetHighscoresButton {
-    display: none; /* Versteckt den Button */
-}
-
-#submitScoreButton:hover, #restartButton:hover, #resetHighscoresButton:hover {
+#submitScoreButton:hover, #restartButton:hover:hover {
     background-color: var(--button-hover-color);
 }
 
@@ -322,36 +300,9 @@ header h1 {
     margin: 0;
 }
 
-/* Swipe-Buttons innerhalb der swipeHint-Anzeige */
-#swipeHint {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 25px;
-    font-size: 2vh;
-    text-align: center;
-    margin-top: 20px;
-    margin-bottom: 1px;
-}
-
-.swipe-button {
-    padding: 11px 15px;
-    font-size: 2.5vh;
-    cursor: pointer;
-    background-color: #444;
-    color: #fff;
-    border: none;
-    border-radius: 20px;
-    transition: background-color 0.3s;
-}
-
-.swipe-button:hover {
-    background-color: #666;
-}
-
 /* Pop-up Meldungen */
 .message-overlay {
-    position: fixed;
+    position: absolute; /* Position relativ zum .game-container */
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -365,78 +316,99 @@ header h1 {
     max-width: 80%;
     word-wrap: break-word;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    display: none; /* Standardmäßig versteckt */
+    box-sizing: border-box; /* Sicherstellen, dass Padding korrekt berechnet wird */
+    pointer-events: none; /* Overlay blockiert keine Klicks */
 }
 
-#highScoreTable {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 2px 0;
-    font-size: 0.8em;
-    font-family: Arial, sans-serif;
-    text-align: center;
-    background-color: transparent;;
-    box-shadow: none;
-    color: #fff;
+
+/* Highscore-Seite spezifische Anpassungen */
+#highScoreList {
+    width: 95%; /* Angepasste Breite für bessere Darstellung */
+    max-width: 800px; /* Maximale Breite für größere Bildschirme */
+    background-color: #000; /* Schwarzer Hintergrund */
+    border: 0 solid #444; /* Dezenter Rand */
+    border-radius: 8px; /* Abgerundete Ecken */
 }
 
-#highScoreTable th, #highScoreTable td {
-    padding: 5px;
-    border: 1px solid rgba(255, 255, 255, 0.3); /* Transparenter Rand */
-}
-
-#highScoreTable th {
-    background-color: rgba(0, 0, 0, 0.5); /* Halbtransparenter Hintergrund für Header */
-    font-weight: bold;
-}
-
-#highScoreTable tr:nth-child(even) {
-    background-color: rgba(0, 0, 0, 0.3); /* Alternierender Hintergrund */
-}
-
-#highScoreTable tr:hover {
-    background-color: rgba(255, 255, 255, 0.1); /* Highlight-Effekt beim Hover */
+#highScoreTitle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .highscore-main {
-    font-size: 1.6em;
+    font-size: 2em;
     font-weight: bold;
     text-align: center;
     display: block;
-    margin: 0; /* Entfernt Margin */
-    margin-top: 30px;
-    padding: 0; /* Sicherstellen, dass es kein Padding gibt */
-    line-height: 1; /* Entfernt zusätzlichen vertikalen Abstand */
+    margin-bottom: 25px;
 }
 
-.highscore-mode {
+.highscore-header {
+    width: 99%;
+    position: relative; /* Erforderlich für die absolute Positionierung der Buttons */
     font-size: 0.8em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+/* Swipe-Buttons absolut positionieren */
+.swipe-button {
+    position: absolute;
+    background-color: rgba(0, 128, 255, 0.8); /* Standardfarbe */
+    border-color: rgba(250, 250, 250, 0.5);
+    color: rgba(250, 250, 250, 0.8);
+    font-size: 1em;
     font-weight: bold;
+    border-radius: 4px;
+    padding: 6px 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.swipe-button:hover {
+    background-color: rgba(0, 102, 204, 0.9); /* Dunkler beim Hover */
+}
+
+/* Links und Rechts positionieren */
+#swipeLeftButton {
+    left: 0; /* Linke Seite des Containers */
+}
+
+#swipeRightButton {
+    right: 0; /* Rechte Seite des Containers */
+}
+
+/* Highscore-Mode zentrieren */
+.highscore-mode {
     text-align: center;
-    display: block;
-    text-transform: uppercase;
-    margin: 0; /* Entfernt jegliche Margin */
+    font-size: 1.2em; /* Optional: Anpassung der Schriftgröße */
+    white-space: nowrap; /* Verhindert Zeilenumbrüche */
 }
 
 /* Highscore-Tabs */
 .highscore-tabs {
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    margin-bottom: 1px;
     width: 100%;
-    justify-content: center;
+    display: flex; /* Korrigiert von 'center' zu 'flex' */
+    justify-content: center; /* Zentriert die Tabs horizontal */
+    flex-wrap: wrap; /* Ermöglicht Zeilenumbruch bei Bedarf */
+    gap: 4px; /* Optional: Abstand zwischen den Tabs */
+    margin-bottom: 8px; /* Angepasster Abstand */
 }
 
 .highscore-tab {
-    flex: 0 0 auto;
-    padding: 6px 10px;
-    margin: 2px 2px;
+    width: 8%;
+    padding: 8px 0;
+    margin: 0 0;
     background-color: rgba(0, 128, 255, 0.8); /* Standardfarbe */
+    border-color: rgba(250, 250, 250, 0.5);
     color: white;
-    border: none;
     border-radius: 4px; /* Leicht abgerundete Ecken */
     cursor: pointer;
-    font-size: 2vh;
+    font-size: 1.75vh;
     transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
 }
 
@@ -447,19 +419,96 @@ header h1 {
 .highscore-tab.active {
     background-color: rgba(0, 60, 150, 1); /* Tiefdunkles Blau für den aktiven Zustand */
     color: #FFD700; /* Goldene Schriftfarbe für Kontrast */
-    transform: scale(1.1); /* Leichte Vergrößerung */
+    transform: scale(1.15); /* Leichte Vergrößerung */
     box-shadow: 0 0 15px rgba(0, 60, 150, 0.8); /* Leuchtender Schatten */
     border: 1px solid #FFD700; /* Goldener Rand */
 }
 
-/* Optional: Scrollbar verstecken */
-.highscore-tabs::-webkit-scrollbar {
-    display: none;
+#highScoreTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 0;
+    font-size: 0.8em;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: transparent;;
+    box-shadow: none;
+    color: #fff;
+    overflow-x: auto; /* Ermöglicht horizontales Scrollen bei Bedarf */
 }
 
-.highscore-tabs {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+/* Tabellenkörper scrollbar machen */
+#highScoreTable thead {
+    width: 100%;
+    border-top: 2px solid rgba(100, 100, 100, 1);
+    border-bottom: 2px solid rgba(100, 100, 100, 1);
+}
+
+/* Sicherstellen, dass jede Zeile korrekt dargestellt wird */
+#highScoreTable thead tr, #highScoreTable tbody tr {
+    width: 100%;
+    display: table;
+    table-layout: fixed; /* Feste Tabellenlayout */
+}
+
+/* Tabellenkopf */
+#highScoreTable thead th {
+    position: sticky;
+    font-weight: bold;
+    font-size: 1em;
+    top: 0; /* Positionierung direkt am oberen Rand des Containers */
+    background-color: rgba(255, 255, 255, 0);
+    color: #FFD700; /* Goldene Schriftfarbe für Kontrast */
+    z-index: 1;
+    box-sizing: border-box;
+    padding: 5px;
+}
+
+/* Tabellenkörper scrollbar machen */
+#highScoreTable tbody {
+    width: 100%;
+    max-height: 40vh; /* Maximale Höhe auf 50% der Viewport-Höhe beschränken */
+    overflow-y: auto;
+    display: block; /* Ermöglicht Scrollen */
+    border-top: none;
+    border-bottom: 2px solid rgba(100, 100, 100, 1);
+}
+
+/* Tabellenzellen */
+#highScoreTable tbody td {
+    box-sizing: border-box;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(50, 50, 50, 1);
+}
+
+/* Spezifische Breiten für jede Spalte festlegen */
+#highScoreTable th:nth-child(1), #highScoreTable tbody td:nth-child(1) { width: 10%; }
+
+#highScoreTable th:nth-child(2), #highScoreTable tbody td:nth-child(2) { width: 20%; }
+
+#highScoreTable th:nth-child(3), #highScoreTable tbody td:nth-child(3) { width: 15%; }
+
+#highScoreTable th:nth-child(4), #highScoreTable tbody td:nth-child(4) { width: 20%; }
+
+#highScoreTable th:nth-child(5), #highScoreTable tbody td:nth-child(5) { width: 15%; }
+
+#highScoreTable th:nth-child(6), #highScoreTable tbody td:nth-child(6) { width: 20%; }
+
+/* Alternierende Hintergrundfarben für Tabellenreihen */
+#highScoreTable tbody tr:nth-child(odd) {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+#highScoreTable tbody tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0);
+}
+
+#highScoreTable tbody tr:last-child td {
+    border-bottom: none; /* Remove the line for the last row */
+}
+
+#highScoreTable tr:hover {
+    background-color: rgba(255, 255, 255, 0.2); /* Highlight-Effekt beim Hover */
 }
 
 .version-display {

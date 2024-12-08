@@ -6,12 +6,13 @@
  */
 
 import { config } from './config.js';
-import { holesData } from '../data/holesData.js';
-import { holesDataOriginal } from '../data/holesData_original.js';
+import { holesDataBeginner } from '../data/holesDataBeginner.js';
+import { holesDataAdvanced } from '../data/holesDataAdvanced.js';
+import { holesDataExpert } from '../data/holesDataExpert.js';
 import { setupInputHandlers } from './input.js';
 import { draw } from './render.js';
-import { initializeUI, updateDisplay } from './ui.js';
-import { moveHoles, stopHoleMovement } from './holeMovement.js';
+import { initializeUI, updateDisplay, hideOverlay } from './ui.js';
+import { startHoleMovements, stopHoleMovement, updateHolePositions } from './holeMovement.js';
 import { setCSSVariables } from './utils.js';
 
 export const gameState = {
@@ -37,19 +38,7 @@ export const gameState = {
     startTime: null,       // Startzeit des Spiels
     elapsedTime: 0,        // Verstrichene Zeit in ms
     timeLastHole: 0,       // Zeit zu der der letzte Punkt gescored wurde in ms
-    times: {
-        time_0: -1,
-        time_1: -1,
-        time_2: -1,
-        time_3: -1,
-        time_4: -1,
-        time_5: -1,
-        time_6: -1,
-        time_7: -1,
-        time_8: -1,
-        time_9: -1,
-        time_10: -1,
-    },
+    level_info: [],
     timerInterval: null,   // Interval-ID für den Timer
     gameEndTimeout: null,  // Timeout-ID für das automatische Beenden des Spiels
     lives: config.maxLives, // Aktuelle Leben
@@ -69,6 +58,9 @@ export function resetGame() {
     gameState.ballInHole = false;
     document.body.classList.remove('showing-end-screen');
 
+    // **Overlay sofort ausblenden und Timer abbrechen**
+    hideOverlay();
+
     // Canvas-Größe aktualisieren
     resizeCanvas();
 
@@ -84,16 +76,20 @@ export function resetGame() {
     // Anzeige aktualisieren
     updateDisplay();
 
+    // Beende die Lochbewegung
+    stopHoleMovement();
+
     // Lochbewegung initialisieren
-    if (gameState.mode === 'expert') {
-        moveHoles(); // Startet die Lochbewegung
-    } else{
-        stopHoleMovement(); // Beende die Lochbewegung
+    if (gameState.mode === 'expert' || gameState.mode === 'advanced') {
+        startHoleMovements(); // Startet die Lochbewegung
     }
 
     // Reset ball speed to prevent carry-over speeds
     gameState.ball.speedX = 0;
     gameState.ball.speedY = 0;
+
+    // Reset currentTarget auf 1
+    gameState.currentTarget = 1;
 }
 
 /**
@@ -160,7 +156,8 @@ function initializeBarAndBall() {
     gameState.bar.color = config.barColor;
 
     // Kugel initialisieren
-    gameState.ball.radius = config.ballRadius;
+    gameState.ball.radius = config.ballRadius * config.canvasWidthInLogicalPixels;
+    gameState.ball.radiusInMeters = config.ballRadius * config.canvasWidthInLogicalPixels * config.logicalPixelsToMeters;
     gameState.ball.color = config.ballColor;
     gameState.ball.x = config.canvasWidthInLogicalPixels * config.ballStartXFraction;
     gameState.ball.y = gameState.bar.leftY - gameState.ball.radius - gameState.bar.height / 2;
@@ -175,12 +172,47 @@ function initializeBarAndBall() {
  * Funktion zur Skalierung und Positionierung der Löcher.
  */
 function scaleAndPositionHoles() {
+    const scalingFactor = Math.min(config.canvasWidthInLogicalPixels, config.canvasHeightInLogicalPixels);
+
     gameState.holes.forEach(hole => {
         hole.actualX = hole.x * config.canvasWidthInLogicalPixels;
         hole.actualY = hole.y * config.canvasHeightInLogicalPixels;
 
-        const scalingFactor = Math.min(config.canvasWidthInLogicalPixels, config.canvasHeightInLogicalPixels);
         hole.actualRadius = hole.radius * scalingFactor;
+
+        // Skalierung der Bewegungsparameter, falls vorhanden
+        if (hole.movement && hole.movement.type !== 'Stationary') {
+            switch (hole.movement.type) {
+                case 'LeftRight':
+                    // Skalierung der horizontalen Verschiebung (Magnitude) und Geschwindigkeit
+                    hole.movement.scaledMagnitude = hole.movement.magnitude * config.canvasWidthInLogicalPixels;
+                    hole.movement.scaledVelocity = hole.movement.velocity * config.canvasWidthInLogicalPixels;
+                    break;
+
+                case 'UpDown':
+                    // Skalierung der vertikalen Verschiebung (Magnitude) und Geschwindigkeit
+                    hole.movement.scaledMagnitude = hole.movement.magnitude * config.canvasHeightInLogicalPixels;
+                    hole.movement.scaledVelocity = hole.movement.velocity * config.canvasHeightInLogicalPixels;
+                    break;
+
+                case 'Circle':
+                    // Skalierung des Kreisradius und Winkelgeschwindigkeit (optional)
+                    hole.movement.scaledRadius = hole.movement.radius * scalingFactor;
+                    // Winkelgeschwindigkeit bleibt unverändert, da sie in Radiant pro Frame definiert ist
+                    break;
+
+                case 'Rectangle':
+                    // Skalierung der Breite, Höhe und Geschwindigkeit
+                    hole.movement.scaledWidth = hole.movement.width * config.canvasWidthInLogicalPixels;
+                    hole.movement.scaledHeight = hole.movement.height * config.canvasHeightInLogicalPixels;
+                    hole.movement.scaledVelocity = hole.movement.velocity * scalingFactor;
+                    break;
+
+                default:
+                    console.warn(`Unbekannter Bewegungstyp: ${hole.movement.type}`);
+                    break;
+            }
+        }
     });
 }
 
@@ -217,11 +249,30 @@ export function initializeGame() {
 
     // Spielschleife starten, falls nicht bereits gestartet
     if (gameState.animationFrameId === null) {
-        gameState.animationFrameId = requestAnimationFrame(function (timestamp) {
-            gameState.lastTimestamp = timestamp; // Initialen Zeitstempel speichern
-            draw(timestamp); // Zeichnen starten
-        });
+        gameState.lastTimestamp = performance.now(); // Initialen Zeitstempel speichern
+        gameState.animationFrameId = requestAnimationFrame(gameLoop);
     }
+}
+
+/**
+ * Die Haupt-Animationsschleife des Spiels.
+ * @param {number} timestamp - Der aktuelle Zeitstempel.
+ */
+function gameLoop(timestamp) {
+    if (!gameState.lastTimestamp) {
+        gameState.lastTimestamp = timestamp;
+    }
+    const deltaTime = (timestamp - gameState.lastTimestamp) / 1000; // ms -> s
+    gameState.lastTimestamp = timestamp;
+
+    // Aktualisiere Lochpositionen
+    updateHolePositions(deltaTime);
+
+    // Zeichne das Spiel
+    draw(deltaTime);
+
+    // Anfrage für den nächsten Frame
+    gameState.animationFrameId = requestAnimationFrame(gameLoop);
 }
 
 /**
@@ -271,18 +322,28 @@ function resizeCanvas() {
  */
 function loadHoleData() {
     if (gameState.mode == 'beginner') {
-        gameState.holes = holesDataOriginal.map(hole => ({
+        gameState.holes = holesDataBeginner.map(hole => ({
             x: hole.X,
             y: hole.Y,
             radius: hole.Radius,
-            Type: hole.Type
+            Type: hole.Type,
+            movement: hole.movement
+        }))
+    } else if (gameState.mode == 'advanced') {
+        gameState.holes = holesDataAdvanced.map(hole => ({
+            x: hole.X,
+            y: hole.Y,
+            radius: hole.Radius,
+            Type: hole.Type,
+            movement: hole.movement
         }))
     } else {
-        gameState.holes = holesData.map(hole => ({
+        gameState.holes = holesDataExpert.map(hole => ({
             x: hole.X,
             y: hole.Y,
             radius: hole.Radius,
-            Type: hole.Type
+            Type: hole.Type,
+            movement: hole.movement
         }))
     }
 }

@@ -8,6 +8,8 @@
 import { gameState } from './gameState.js';
 import { config} from './config.js';
 
+let overlayTimeoutId = null; // Variable zum Speichern der Timeout-ID
+
 /**
  * Funktion zur Initialisierung der Benutzeroberfläche.
  * Aktualisiert die Anzeige beim Spielstart.
@@ -60,15 +62,43 @@ export function updateDisplay() {
  * @param {function} callback - Funktion, die nach Ablauf ausgeführt wird.
  */
 export function showTemporaryMessage(message, duration, callback) {
-    const messageOverlay = document.createElement('div');
-    messageOverlay.className = 'message-overlay';
-    messageOverlay.textContent = message;
-    document.body.appendChild(messageOverlay);
+    const gameContainer = document.querySelector('.game-container');
+    const messageOverlay = gameContainer.querySelector('#messageOverlay');
+    if (messageOverlay) {
+        messageOverlay.textContent = message;
+        messageOverlay.style.display = 'block';
 
-    setTimeout(() => {
-        if (document.body.contains(messageOverlay)) {
-            document.body.removeChild(messageOverlay);
+         // Falls bereits ein Timer läuft, diesen abbrechen
+         if (overlayTimeoutId !== null) {
+            clearTimeout(overlayTimeoutId);
         }
+
+        // Neuen Timer setzen und die Timeout-ID speichern
+        overlayTimeoutId = setTimeout(() => {
+            messageOverlay.style.display = 'none';
+            overlayTimeoutId = null; // Timeout abgeschlossen
+            if (callback) callback();
+        }, duration);
+    } else {
+        console.warn('Message overlay element not found within game-container.');
         if (callback) callback();
-    }, duration);
+    }
+}
+
+/**
+ * Funktion zum sofortigen Ausblenden des Overlays und Abbrechen laufender Timer.
+ */
+export function hideOverlay() {
+    const gameContainer = document.querySelector('.game-container');
+    const messageOverlay = gameContainer.querySelector('#messageOverlay');
+
+    if (messageOverlay) {
+        messageOverlay.style.display = 'none';
+    }
+
+    // Laufenden Timer abbrechen
+    if (overlayTimeoutId !== null) {
+        clearTimeout(overlayTimeoutId);
+        overlayTimeoutId = null;
+    }
 }

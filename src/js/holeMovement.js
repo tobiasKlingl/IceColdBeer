@@ -6,73 +6,125 @@
  */
 
 import { gameState } from './gameState.js';
-import { config } from './config.js';
+import { getCachedSin, getCachedCos } from './angleCache.js'; // Importiere den Winkel-Cache
 
-let holeMovementIntervals = {};
+// Speicher für die Bewegungszustände der Löcher
+let holeMovementStates = {};
 
-export function moveHoles() {
-    // Alle vorhandenen Intervalle löschen
-    for (let key in holeMovementIntervals) {
-        clearInterval(holeMovementIntervals[key]);
-    }
-    holeMovementIntervals = {};
-
+/**
+ * Initialisiert die Bewegungszustände für alle Löcher basierend auf ihren Bewegungstypen.
+ */
+function initializeHoleMovements() {
     gameState.holes.forEach(hole => {
-        const holeTypeNum = parseInt(hole.Type);
-        let radius, speed, angleRange;
-
-        if (holeTypeNum === gameState.currentTarget) {
-            // Ziel-Loch
-            radius = config.expertModeHoleMovementRadiusTarget;
-            speed = config.expertModeHoleMovementSpeedTarget;
-            angleRange = config.expertModeHoleDirectionAngleRange;
-        } else if (holeTypeNum >= 1 && holeTypeNum <= config.totalLevels) {
-            // Andere Ziel-Löcher
-            radius = config.expertModeHoleMovementRadiusTarget;
-            speed = config.expertModeHoleMovementSpeedTarget;
-            angleRange = config.expertModeHoleDirectionAngleRange;
-        } else {
-            // Nieten-Loch
-            radius = config.expertModeHoleMovementRadiusMiss;
-            speed = config.expertModeHoleMovementSpeedMiss;
-            angleRange = config.expertModeHoleDirectionAngleRange;
+        const movement = hole.movement;
+        if (movement && movement.type !== 'Stationary') {
+            holeMovementStates[hole.Type] = {
+                type: movement.type,
+                originalX: hole.actualX,
+                originalY: hole.actualY,
+                currentAngle: 0, // Für Kreisbewegungen
+                direction: 1,     // Für Rechteckbewegungen
+                step: 0,          // Fortschritt auf dem Pfad
+                // Skalierte Parameter
+                ...(
+                    movement.type === 'LeftRight' ? {
+                        magnitude: movement.scaledMagnitude,
+                        velocity: movement.scaledVelocity
+                    } : {}
+                ),
+                ...(
+                    movement.type === 'UpDown' ? {
+                        magnitude: movement.scaledMagnitude,
+                        velocity: movement.scaledVelocity
+                    } : {}
+                ),
+                ...(
+                    movement.type === 'Circle' ? {
+                        radius: movement.scaledRadius,
+                        angularVelocity: movement.angularVelocity // bleibt unverändert
+                    } : {}
+                ),
+                ...(
+                    movement.type === 'Rectangle' ? {
+                        width: movement.scaledWidth,
+                        height: movement.scaledHeight,
+                        velocity: movement.scaledVelocity
+                    } : {}
+                )
+            };
         }
-
-        const originalX = hole.actualX;
-        const originalY = hole.actualY;
-        let currentAngle = Math.random() * 2 * Math.PI;
-
-        // Bewegung aktualisieren
-        holeMovementIntervals[hole.Type] = setInterval(() => {
-            // Position aktualisieren
-            hole.actualX += Math.cos(currentAngle) * speed;
-            hole.actualY += Math.sin(currentAngle) * speed;
-
-            // Entfernung vom Ursprung berechnen
-            const dx = hole.actualX - originalX;
-            const dy = hole.actualY - originalY;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-
-            // Wenn Maximalradius erreicht, Richtung invertieren
-            if (distance >= radius) {
-                currentAngle += Math.PI; // Richtung umkehren
-                currentAngle += (Math.random() - 0.5) * (angleRange * Math.PI / 180);
-                hole.actualX = originalX + (dx / distance) * radius;
-                hole.actualY = originalY + (dy / distance) * radius;
-            }
-
-            // Alle Sekunde die Richtung leicht ändern
-            if (Math.random() < (1000 / config.expertModeHoleDirectionChangeInterval)) {
-                currentAngle += (Math.random() - 0.5) * (angleRange * Math.PI / 180);
-            }
-
-        }, 30); // Aktualisierung alle 30 ms
     });
 }
 
-export function stopHoleMovement() {
-    for (let key in holeMovementIntervals) {
-        clearInterval(holeMovementIntervals[key]);
+/**
+ * Bewegt die Löcher gemäß ihrer definierten Bewegungstypen.
+ * @param {number} deltaTime - Zeit seit dem letzten Frame in Sekunden.
+ */
+export function updateHolePositions(deltaTime) {
+    for (const hole of gameState.holes) {
+        const state = holeMovementStates[hole.Type];
+        if (!state) continue;
+
+        switch (state.type) {
+            case 'LeftRight':
+                hole.actualX += state.velocity * state.direction * deltaTime;
+                if (Math.abs(hole.actualX - state.originalX) >= state.magnitude) {
+                    hole.actualX = state.originalX + state.direction * state.magnitude;
+                    state.direction *= -1;
+                }
+                break;
+
+            case 'UpDown':
+                hole.actualY += state.velocity * state.direction * deltaTime;
+                if (Math.abs(hole.actualY - state.originalY) >= state.magnitude) {
+                    hole.actualY = state.originalY + state.direction * state.magnitude;
+                    state.direction *= -1;
+                }
+                break;
+
+            case 'Circle':
+                state.currentAngle += state.angularVelocity * deltaTime;
+                hole.actualX = state.originalX + state.radius * getCachedCos(state.currentAngle);
+                hole.actualY = state.originalY + state.radius * getCachedSin(state.currentAngle);
+                break;
+
+            case 'Rectangle':
+                state.step += state.velocity * deltaTime;
+                const perimeter = 2 * (state.width + state.height);
+                const progress = state.step % perimeter;
+
+                if (progress < state.width) {
+                    hole.actualX = state.originalX + progress;
+                    hole.actualY = state.originalY;
+                } else if (progress < state.width + state.height) {
+                    hole.actualX = state.originalX + state.width;
+                    hole.actualY = state.originalY + (progress - state.width);
+                } else if (progress < 2 * state.width + state.height) {
+                    hole.actualX = state.originalX + state.width - (progress - state.width - state.height);
+                    hole.actualY = state.originalY + state.height;
+                } else {
+                    hole.actualX = state.originalX;
+                    hole.actualY = state.originalY + state.height - (progress - 2 * state.width - state.height);
+                }
+                break;
+
+            default:
+                // Stationary oder unbekannter Typ
+                break;
+        }
     }
-    holeMovementIntervals = {};
+}
+
+/**
+ * Initialisiert die Lochbewegungen.
+ */
+export function startHoleMovements() {
+    initializeHoleMovements();
+}
+
+/**
+ * Stoppt die Bewegung der Löcher, indem die Zustände zurückgesetzt werden.
+ */
+export function stopHoleMovement() {
+    holeMovementStates = {};
 }

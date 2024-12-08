@@ -10,6 +10,7 @@ import { resetGame } from './gameState.js';
 import { updateDisplay, showTemporaryMessage } from './ui.js';
 import { updateBars } from './input.js';
 import { stopHoleMovement } from './holeMovement.js';
+import { Timestamp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
 
 export function applyPhysics(deltaTime) {
     if (gameState.gameOver || gameState.ballInHole) {
@@ -59,40 +60,74 @@ export function applyPhysics(deltaTime) {
 
         // Schwerkraftkomponente entlang der Stange
         const gravityForceAlongBar = gravityInPixels * Math.sin(angle);
+        const normalForce = gravityInPixels * Math.cos(angle);
+
+        // Bestimme die Richtung der Reibung
+        let frictionDirectionX = 0;
+        if (gameState.ball.speedX !== 0) {
+            frictionDirectionX = -Math.sign(gameState.ball.speedX);
+        } else {
+            // Wenn die Kugel stillsteht, Reibung entgegengesetzt zur potenziellen Bewegung
+            frictionDirectionX = -Math.sign(Math.sin(angle));
+        }
 
         // Haftreibung prüfen
-        const normalForce = gravityInPixels * Math.cos(angle);
-        const staticFrictionForce = config.staticFrictionCoefficient * normalForce
+        const staticFrictionForce = frictionDirectionX * config.staticFrictionCoefficient * normalForce;
+
+        const rollingConditionFactor = 2 / 7; // 0.2857 für das Verhältnis 2/7
 
         if (config.withLogging == true) {
             console.log("normalForce = " + normalForce)
             console.log("gravityForceAlongBar = " + gravityForceAlongBar)
+            console.log("rollingConditionFactor*gravityForceAlongBar = " + rollingConditionFactor*gravityForceAlongBar)
             console.log("staticFrictionForce: " + staticFrictionForce)
         }
 
+        let accelerationForce = 0;
+
         // Haftreibung prüfen
-        if (Math.abs(gameState.ball.speedX) < 1e-5) { // Kugel steht fast still
-            if (Math.abs(gravityForceAlongBar) <= Math.abs(staticFrictionForce)) {
-                gameState.ball.speedX = 0;
+        if (Math.abs(rollingConditionFactor*gravityForceAlongBar) <= Math.abs(staticFrictionForce)) {
+            // Reines Rollen der Kugel. Kein Schlupf (d. h. kein Gleiten der Kugel) => Verwende Rollreibung
+            const rotationFrictionForce = frictionDirectionX * config.rotationFrictionCoefficient * normalForce;
+            if (config.withLogging == true) {
+                console.log("rotationFrictionForce = " + rotationFrictionForce);
+            }
+
+            const accelerationFactor = 5 / 7; // Ein Teil der Energie geht in Rotationsenergie und der andere in kinetische Energie => Faktor 5/7 = 0.7143
+
+            if (Math.sign(gravityForceAlongBar) == frictionDirectionX || Math.abs(gravityForceAlongBar) - Math.abs(rotationFrictionForce) > 0){
+                accelerationForce = accelerationFactor * (gravityForceAlongBar + rotationFrictionForce);
             } else {
-                // Kugel bewegt sich, kinetische Reibung anwenden
-                const kineticFrictionForce = Math.sign(gameState.ball.speedX) * config.kineticFrictionCoefficient * normalForce;
-                const netForce = gravityForceAlongBar - kineticFrictionForce;
-                gameState.ball.speedX += netForce * deltaTime;
+                accelerationForce = 0;
+            }
+            if (config.withLogging == true) {
+                console.log("accelerationForce (rollen) = " + accelerationForce);
             }
         } else {
-             // Kugel bewegt sich bereits, kinetische Reibung anwenden
-             const kineticFrictionForce = Math.sign(gameState.ball.speedX) * config.kineticFrictionCoefficient * normalForce;
-             const netForce = gravityForceAlongBar - kineticFrictionForce;
-             gameState.ball.speedX += netForce * deltaTime;
+            // Kugel beginnt zu Gleiten, Überlagerung aus Rollen und Gleiten simulieren
+            const kineticFrictionForce = frictionDirectionX * config.kineticFrictionCoefficient * normalForce;
+            if (config.withLogging == true) {
+                console.log("kineticFrictionForce = " + kineticFrictionForce);
+            }
+
+            if (Math.sign(gravityForceAlongBar) == frictionDirectionX || Math.abs(gravityForceAlongBar) - Math.abs(kineticFrictionForce) > 0){
+                accelerationForce = gravityForceAlongBar + kineticFrictionForce;
+            } else {
+                accelerationForce = 0;
+            }
+            if (config.withLogging == true) {
+                console.log("accelerationForce (gleiten) = " + accelerationForce)
+            }
         }
+
+        gameState.ball.speedX += accelerationForce * deltaTime;
     } else {
         // Kugel ist nicht auf der Stange
         gameState.ball.speedY += gravityInPixels * deltaTime; // Schwerkraft anwenden
     }
 
     // Quadratischer Luftwiderstand in der Luft
-    applyAirResistance(gameState.ball, deltaTime);
+    // applyAirResistance(gameState.ball, deltaTime); // disabled since negligable
 
     // Position aktualisieren
     gameState.ball.x += gameState.ball.speedX * deltaTime;
@@ -144,7 +179,7 @@ function applyAirResistance(ball, deltaTime) {
     // Luftwiderstandskraft (SI-Einheiten)
     const dragForce = 0.5 * config.airDensity * config.dragCoefficient * Math.PI *
     //Math.pow(ball.radius * config.physicalPixelsToMeters, 2) * Math.pow(speedInMeters, 2);
-    Math.pow(ball.radius * config.logicalPixelsToMeters, 2) * Math.pow(speedInMeters, 2);
+    Math.pow(ball.radiusInMeters , 2) * Math.pow(speedInMeters, 2);
 
     // Kraft in SI -> Beschleunigung in SI -> zurück in Pixel
     const dragAcceleration = dragForce / config.ballMass;
@@ -189,8 +224,16 @@ function handleCorrectHole() {
         '✨ Super Schuss! Auf zu Loch ' + (gameState.currentTarget + 1) + '!',
     ];
 
+    const timeForLevel = gameState.elapsedTime - gameState.timeLastHole;
+    // Dynamisch nur die tatsächlich erreichten Level speichern
+    gameState.level_info.push({
+        'level': gameState.currentTarget,
+        'time': timeForLevel,
+        'lives': gameState.lives,
+        'date': Timestamp.now(),
+    });
+
     gameState.timeLastHole = gameState.elapsedTime;
-    gameState.times[`time_${gameState.currentTarget}`] = gameState.elapsedTime;
 
     // Lochbewegung stoppen
     if (gameState.mode === 'expert') {

@@ -9,18 +9,11 @@ import { gameState } from './gameState.js';
 import { applyPhysics } from './physics.js';
 import { config } from './config.js';
 
-// Vorheriger Zeitstempel initialisieren
-let lastTimestamp = 0;
-
 /**
  * Hauptzeichnungsfunktion.
- * @param {DOMHighResTimeStamp} timestamp - Der aktuelle Zeitstempel in Millisekunden.
-*/
-export function draw(timestamp) {
-    // Zeitintervall berechnen (in Sekunden)
-    const deltaTime = (timestamp - lastTimestamp) / 1000; // ms -> s
-    lastTimestamp = timestamp;
-
+ * @param {number} deltaTime - Zeit seit dem letzten Frame in Sekunden.
+ */
+export function draw(deltaTime) {
     // Canvas leeren
     gameState.ctx.clearRect(0, 0, gameState.canvas.width, gameState.canvas.height);
 
@@ -48,7 +41,7 @@ export function draw(timestamp) {
         // Weißen Rand zeichnen
         if ( holeTypeNum <= config.totalLevels) {
             gameState.ctx.beginPath();
-            gameState.ctx.arc(hole.actualX, hole.actualY, hole.actualRadius, 0, Math.PI * 2);
+            gameState.ctx.arc(hole.actualX, hole.actualY, hole.actualRadius + config.holeBorderWidth / 2, 0, Math.PI * 2);
             gameState.ctx.lineWidth = config.holeBorderWidth;
             gameState.ctx.strokeStyle = config.colors.holeBorderColor;
             gameState.ctx.stroke();
@@ -88,7 +81,4 @@ export function draw(timestamp) {
 
     // Physik anwenden
     applyPhysics(deltaTime);
-
-    // Nächsten Frame anfordern
-    gameState.animationFrameId = requestAnimationFrame(draw);
 }
