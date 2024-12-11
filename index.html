@@ -1,23 +1,14 @@
-<!-- index.html -->
-
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <!-- Meta-Angaben für Zeichensatz und Titel -->
     <meta charset="UTF-8">
     <title>Ice Cold Beer 🍺</title>
-    <!-- Responsives Design für mobile Geräte -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <!-- Einbindung der CSS-Datei -->
     <link rel="stylesheet" href="style.css?v={{ VERSION_TAG }}">
-    <!-- SweetAlert2 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-
-    <!-- SweetAlert2 JS -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
-    <!-- Spielmodus-Auswahl -->
     <div id="modeSelectionScreen">
         <h1>Ice Cold Beer 🍺</h1>
         <h2>Wähle den Spielmodus:</h2>
@@ -27,41 +18,28 @@
         <button id="viewHighscoresButton">Highscores ansehen 🏆</button>
     </div>
 
-    <!-- Kopfbereich der Seite -->
     <header style="display: none;">
         <h1>Ice Cold Beer 🍺</h1>
-        <!-- Zurück-Button -->
         <button id="backToModeSelectionButton">⬅️</button>
     </header>
 
-    <!-- Spielcontainer -->
     <div class="game-container" style="display: none;">
-        <!-- Canvas-Element für das Spiel -->
         <canvas id="gameCanvas"></canvas>
-         <!-- Message Overlay innerhalb des Spielcontainers -->
-         <div id="messageOverlay" class="message-overlay" style="display: none;"></div>
+        <div id="messageOverlay" class="message-overlay" style="display: none;"></div>
     </div>
 
-    <!-- Steuerungselemente -->
     <div class="controls" style="display: none;">
-        <!-- Linker Schaltknüppel -->
         <div class="joystick-container" id="leftJoystickContainer">
             <div class="joystick" id="leftJoystick">
-                <!-- Griff des Schaltknüppels -->
                 <div class="joystick-handle">
-                    <!-- Doppelpfeil-Emoji -->
                     <span class="joystick-icon">↕️</span>
                 </div>
             </div>
         </div>
-        <!-- Zentrale Steuerungselemente -->
         <div class="center-controls">
-            <!-- Timer-Anzeige -->
             <div id="timer">Zeit: 00:00</div>
-            <!-- Spiel zurücksetzen Button -->
             <button id="gameResetButton">🔄</button>
         </div>
-        <!-- Rechter Schaltknüppel -->
         <div class="joystick-container" id="rightJoystickContainer">
             <div class="joystick" id="rightJoystick">
                 <div class="joystick-handle">
@@ -71,32 +49,23 @@
         </div>
     </div>
 
-    <!-- Spielinformationen -->
     <div class="game-info" style="display: none;">
-        <!-- Anzeige der Leben -->
         <div id="lives">Leben: ❤️❤️❤️</div>
-        <!-- Anzeige des aktuellen Modus -->
         <div id="currentMode">Modus: 😀</div>
-        <!-- Anzeige des aktuellen Ziels -->
         <div id="currentHole">Ziel: Loch 1</div>
     </div>
 
-    <!-- Endbildschirm -->
     <div id="endScreen">
         <div id="endMessage"></div>
-        <!-- Highscore-Eingabe -->
         <div id="highScoreInput">
             <label for="playerName">Name eingeben:</label>
             <input type="text" id="playerName" maxlength="10">
             <button id="submitScoreButton">Bestätigen</button>
         </div>
-        <!-- Highscore-Liste -->
         <div id="highScoreList">
             <h2 id="highScoreTitle">
                 <span class="highscore-main">Highscore 🏆</span>
             </h2>
-
-            <!-- Neue Tab-Navigation hinzufügen -->
             <div class="highscore-tabs">
                 <button class="highscore-tab active" data-level="overall">🏆</button>
                 <button class="highscore-tab" data-level="1">1</button>
@@ -109,9 +78,7 @@
                 <button class="highscore-tab" data-level="8">8</button>
                 <button class="highscore-tab" data-level="9">9</button>
                 <button class="highscore-tab" data-level="10">10</button>
-            </div> 
-
-
+            </div>
             <table id="highScoreTable">
                 <thead>
                     <tr>
@@ -124,18 +91,13 @@
                     </tr>
                 </thead>
                 <tbody id="highScoreItems">
-                    <!-- Zeilen werden hier dynamisch eingefügt -->
                 </tbody>
             </table>
         </div>
-        <!-- Neues Spiel Button -->
         <button id="restartButton">Neues Spiel 🔄</button>
     </div>
 
     <div class="version-display" style="display: block;">Version: {{ VERSION_TAG }}</div>
-
-    <!-- Einbindung der JavaScript-Datei -->
     <script type="module" src="src/js/main.js?v={{ VERSION_TAG }}"></script>
-
 </body>
 </html>

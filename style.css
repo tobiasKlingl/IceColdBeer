@@ -10,8 +10,6 @@
     --element-opacity: var(--config-element-opacity);
     /* Größe der Buttons */
     --button-size: var(--config-button-size);
-    /* Größe des Reset-Buttons */
-    --restart-button-size: var(--config-restart-button-size);
     /* Schriftgröße der Buttons */
     --button-font-size: var(--config-button-font-size);
     /* Breite des Spielfeldrandes */
@@ -284,15 +282,15 @@ header h1 {
 }
 
 .center-controls > button#gameResetButton {
-    width: var(--restart-button-size);
-    height: var(--restart-button-size);
+    width: 100px;
+    height: 100px;
     background-color: var(--button-color);
     color: white;
     border: none;
     border-radius: 50%;
     cursor: pointer;
-    font-size: 8vh;
-    line-height: var(--restart-button-size);
+    /*padding: 20px;*/
+    font-size: 6vh;
     transition: background-color 0.3s ease;
     display: flex;
     align-items: center;
@@ -467,7 +465,7 @@ header h1 {
 /* Tabellenkörper scrollbar machen */
 #highScoreTable tbody {
     width: 100%;
-    max-height: 40vh; /* Maximale Höhe auf 50% der Viewport-Höhe beschränken */
+    max-height: 36vh; /* Maximale Höhe auf 50% der Viewport-Höhe beschränken */
     overflow-y: auto;
     display: block; /* Ermöglicht Scrollen */
     border-top: none;
@@ -481,10 +479,16 @@ header h1 {
     border-bottom: 1px solid rgba(50, 50, 50, 1);
 }
 
+/* Spezifische Hervorhebung für die Highscore-Tabelle */
+#highScoreTable tbody td.highlight {
+    color: #ffff55 !important; /* Orange-Rot für den Text */
+    font-weight: bold !important; /* Fettgedruckter Text */
+}
+
 /* Spezifische Breiten für jede Spalte festlegen */
 #highScoreTable th:nth-child(1), #highScoreTable tbody td:nth-child(1) { width: 10%; }
 
-#highScoreTable th:nth-child(2), #highScoreTable tbody td:nth-child(2) { width: 20%; }
+#highScoreTable th:nth-child(2), #highScoreTable tbody td:nth-child(2) { width: 19%; }
 
 #highScoreTable th:nth-child(3), #highScoreTable tbody td:nth-child(3) { width: 15%; }
 
@@ -492,7 +496,7 @@ header h1 {
 
 #highScoreTable th:nth-child(5), #highScoreTable tbody td:nth-child(5) { width: 15%; }
 
-#highScoreTable th:nth-child(6), #highScoreTable tbody td:nth-child(6) { width: 20%; }
+#highScoreTable th:nth-child(6), #highScoreTable tbody td:nth-child(6) { width: 21%; }
 
 /* Alternierende Hintergrundfarben für Tabellenreihen */
 #highScoreTable tbody tr:nth-child(odd) {
