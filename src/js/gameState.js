@@ -32,6 +32,7 @@ export const gameState = {
     startTime: null,
     elapsedTime: 0,
     timeLastHole: 0,
+    livesLastHole: config.gameplay.maxLives,
     level_info: [],
     timerInterval: null,
     gameEndTimeout: null,
@@ -49,7 +50,22 @@ export const gameState = {
     currentHoleElement: null,
     timerDisplayElement: null,
     currentModeElement: null,
-    messageOverlayElement: null
+    messageOverlayElement: null,
+
+    // Abschirmungszustand für den Expertenmodus
+    shutter: {
+        state: 'idle', // 'idle', 'warning', 'closing', 'closed', 'opening'
+        timer: 0,
+        progress: 0,
+        cycleTimer: 0,
+        shutterWarningTime: null,
+        shutterClosingTime: null,
+        shutterClosedDuration: null,
+        shutterOpeningTime: null,
+        shutterCycleInterval: null
+    },
+
+    lastTimestamp: null
 };
 
 export function resetGame() {
@@ -58,7 +74,6 @@ export function resetGame() {
     hideOverlay();
     gameState.overlayCancelled = true;
 
-
     resizeCanvas();
     initializeBarAndBall();
     loadHoleData();
@@ -66,9 +81,9 @@ export function resetGame() {
     updateDisplay();
     stopHoleMovement();
 
-    // Lochbewegung initialisieren
-    if (['expert', 'advanced'].includes(gameState.mode)) {
-        startHoleMovements(); // Startet die Lochbewegung
+    if (gameState.mode !== 'beginner') {
+        startHoleMovements();
+        initializeShutterState();
     }
 
     gameState.ball.speedX = 0;
@@ -78,6 +93,7 @@ export function resetGame() {
 export function resetGameStats() {
     gameState.lives = config.gameplay.maxLives;
     gameState.currentTarget = 1;
+    gameState.level_info = [];
 }
 
 export function resetTimer() {
@@ -85,6 +101,7 @@ export function resetTimer() {
     gameState.startTime = Date.now();
     gameState.elapsedTime = 0;
     gameState.timeLastHole = 0;
+    gameState.livesLastHole = config.gameplay.maxLives;
     gameState.timerInterval = setInterval(function () {
         gameState.elapsedTime = Date.now() - gameState.startTime;
         updateDisplay();
@@ -117,6 +134,7 @@ function returnToModeSelectionScreen() {
     resetGame();
     clearInterval(gameState.timerInterval);
     clearTimeout(gameState.gameEndTimeout);
+    resizeCanvas();
 }
 
 function initializeBarAndBall() {
@@ -141,14 +159,8 @@ function initializeBarAndBall() {
 
 function scaleAndPositionHoles(mode) {
     const scalingFactor = Math.min(config.canvasWidthInLogicalPixels, config.canvasHeightInLogicalPixels);
-    let scaleFactorHoleVelocity = 1;
-    if (mode === 'advanced') {
-        scaleFactorHoleVelocity = config.holes.scaleFactorHoleVelocityAdvanced;
-    } else if (mode === 'extrem') {
-        scaleFactorHoleVelocity = config.holes.scaleFactorHoleVelocityExtrem;
-    }
+    const scaleFactorHoleVelocity = config.modes.gameModes[gameState.mode].scaleFactorHoleVelocity;
 
-    config.holes.scaleFactorHoleVelocityAdvanced;
     gameState.holes.forEach(hole => {
         hole.actualX = hole.x * config.canvasWidthInLogicalPixels;
         hole.actualY = hole.y * config.canvasHeightInLogicalPixels;
@@ -187,10 +199,8 @@ export function initializeGame() {
     setCSSVariables();
     resizeCanvas();
 
-    // currentTarget am Spielstart auf 1
     gameState.currentTarget = 1;
 
-    // DOM Elemente cachen
     gameState.livesDisplayElement = document.getElementById('lives');
     gameState.currentHoleElement = document.getElementById('currentHole');
     gameState.timerDisplayElement = document.getElementById('timer');
@@ -208,20 +218,8 @@ export function initializeGame() {
 
     if (gameState.animationFrameId === null) {
         gameState.lastTimestamp = performance.now();
-        gameState.animationFrameId = requestAnimationFrame(gameLoop);
+        gameLoop(gameState.lastTimestamp);
     }
-}
-
-function gameLoop(timestamp) {
-    if (!gameState.lastTimestamp) {
-        gameState.lastTimestamp = timestamp;
-    }
-    const deltaTime = (timestamp - gameState.lastTimestamp) / 1000;
-    gameState.lastTimestamp = timestamp;
-
-    updateHolePositions(deltaTime);
-    draw(deltaTime);
-    gameState.animationFrameId = requestAnimationFrame(gameLoop);
 }
 
 function resizeCanvas() {
@@ -278,4 +276,84 @@ function loadHoleData() {
             movement: hole.movement
         }));
     }
+}
+
+function initializeShutterState() {
+    gameState.shutter.state = 'idle';
+    gameState.shutter.timer = 0;
+    gameState.shutter.progress = 0;
+    gameState.shutter.cycleTimer = 0;
+    gameState.shutter.shutterWarningTime = config.modes.gameModes[gameState.mode].shutterWarningTime,
+    gameState.shutter.shutterClosingTime = config.modes.gameModes[gameState.mode].shutterClosingTime,
+    gameState.shutter.shutterClosedDuration = config.modes.gameModes[gameState.mode].shutterClosedDuration,
+    gameState.shutter.shutterOpeningTime = config.modes.gameModes[gameState.mode].shutterOpeningTime,
+    gameState.shutter.shutterCycleInterval = config.modes.gameModes[gameState.mode].shutterCycleInterval
+}
+
+/**
+ * Aktualisiert den Zustand der Abschirmungen.
+ * Wird jetzt gestoppt, wenn ballInHole oder gameOver true ist.
+ * @param {number} deltaTime - Zeit seit letztem Frame in Sekunden
+ */
+function updateShutterState(deltaTime) {
+    // Wenn Ball im Loch oder Spiel vorbei ist: Shutter Logik einfrieren
+    if (gameState.ballInHole || gameState.gameOver) return;
+
+    const s = gameState.shutter;
+    s.timer += deltaTime * 1000; // ms
+
+    switch (s.state) {
+        case 'warning':
+            if (s.timer >= s.shutterWarningTime) {
+                s.state = 'closing';
+                s.timer = 0;
+            }
+            break;
+        case 'closing':
+            s.progress = Math.min(1, s.timer / s.shutterClosingTime);
+            if (s.progress >= 1) {
+                s.state = 'closed';
+                s.timer = 0;
+            }
+            break;
+        case 'closed':
+            if (s.timer >= s.shutterClosedDuration) {
+                s.state = 'opening';
+                s.timer = 0;
+            }
+            break;
+        case 'opening':
+            s.progress = 1 - Math.min(1, s.timer / s.shutterOpeningTime);
+            if (s.progress <= 0) {
+                s.state = 'idle';
+                s.timer = 0;
+                s.progress = 0;
+                s.cycleTimer = 0;
+            }
+            break;
+        case 'idle':
+            s.cycleTimer += deltaTime * 1000;
+            if (s.cycleTimer >= s.shutterCycleInterval) {
+                s.state = 'warning';
+                s.timer = 0;
+                s.progress = 0;
+                s.cycleTimer = 0;
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+function gameLoop(timestamp) {
+    if (!gameState.lastTimestamp) {
+        gameState.lastTimestamp = timestamp;
+    }
+    const deltaTime = (timestamp - gameState.lastTimestamp) / 1000;
+    gameState.lastTimestamp = timestamp;
+
+    updateHolePositions(deltaTime);
+    updateShutterState(deltaTime);
+    draw(deltaTime);
+    gameState.animationFrameId = requestAnimationFrame(gameLoop);
 }

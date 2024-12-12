@@ -4,10 +4,16 @@ import { config } from './config.js';
 
 let overlayTimeoutId = null;
 
+/**
+ * Initialisiert die UI-Anzeigen.
+ */
 export function initializeUI() {
     updateDisplay();
 }
 
+/**
+ * Aktualisiert die Anzeigen wie Leben, Zeit, aktuelles Loch.
+ */
 export function updateDisplay() {
     const livesDisplay = gameState.livesDisplayElement;
     const currentHoleDisplay = gameState.currentHoleElement;
@@ -36,6 +42,12 @@ export function updateDisplay() {
     timerDisplay.textContent = 'Zeit: ' + minutes + ':' + seconds;
 }
 
+/**
+ * Zeigt vorübergehend eine Nachricht über dem Spielfeld an.
+ * @param {string} message - Anzuzeigende Nachricht
+ * @param {number} duration - Dauer in ms
+ * @param {Function} callback - Optionale Callback-Funktion nach Ablauf
+ */
 export function showTemporaryMessage(message, duration, callback) {
     const messageOverlay = gameState.messageOverlayElement;
     if (messageOverlay) {
@@ -60,6 +72,9 @@ export function showTemporaryMessage(message, duration, callback) {
     }
 }
 
+/**
+ * Versteckt das Overlay.
+ */
 export function hideOverlay() {
     const messageOverlay = gameState.messageOverlayElement;
 

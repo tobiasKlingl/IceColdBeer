@@ -59,54 +59,28 @@ function applyPhysicsStep(dt) {
             frictionDirection = -Math.sign(sinAngle);
         }
 
-        // Nutzung normaler Reibungswerte (nicht mehr reduzieren)
         const staticFrictionForce = frictionDirection * config.physics.staticFrictionCoefficient * normalForce;
         const rollingConditionFactor = 2 / 7;
         const factorRollingPart = config.physics.staticFrictionCoefficient / (rollingConditionFactor * Math.abs(barSlope));
         const factorKineticPart = (1 - factorRollingPart);
 
-        if (config.withLogging == true) {
-            console.log("gameState.ball.speedX = " + gameState.ball.speedX);
-            console.log("gameState.ball.speedY = " + gameState.ball.speedY);
-            console.log("angle = " + angle*180/(Math.PI));
-            console.log("factorKineticPart, factorRollingPart = " + factorKineticPart + ", " + factorRollingPart);
-            console.log("normalForce = " + normalForce);
-            console.log("gravityForceAlongBar = " + gravityForceAlongBar);
-            console.log("rollingConditionFactor*gravityForceAlongBar = " + rollingConditionFactor*gravityForceAlongBar);
-            console.log("staticFrictionForce: " + staticFrictionForce);
-        }
-
         let accelerationForce = 0;
 
         if (factorRollingPart >= 1) {
             const rollingFrictionForce = frictionDirection * config.physics.rollingFrictionCoefficient * normalForce;
-            if (config.withLogging == true) {
-                console.log("rollingFrictionForce = " + rollingFrictionForce);
-            }
             if (Math.sign(gravityForceAlongBar) == frictionDirection || Math.abs(gravityForceAlongBar) - Math.abs(rollingFrictionForce) > 0){
                 accelerationForce = (5/7) * (gravityForceAlongBar + rollingFrictionForce);
             } else {
                 accelerationForce = 0;
             }
-            if (config.withLogging == true) {
-                console.log("accelerationForce (rollen) = " + accelerationForce);
-            }
         } else {
-            if (factorKineticPart > 1 || factorKineticPart < 0 || factorRollingPart > 0) {
-                console.log("Das sollte nicht vorkommen. ");
-            }
             const rollingFrictionForce = frictionDirection * config.physics.rollingFrictionCoefficient * normalForce;
             const kineticFrictionForce = frictionDirection * config.physics.kineticFrictionCoefficient * normalForce;
-            if (config.withLogging == true) {
-                console.log("kineticFrictionForce = " + kineticFrictionForce);
-            }
+
             if (Math.sign(gravityForceAlongBar) == frictionDirection || Math.abs(gravityForceAlongBar) - Math.abs(kineticFrictionForce) - Math.abs(rollingFrictionForce) > 0){
                 accelerationForce = factorRollingPart * (5/7) * (gravityForceAlongBar + rollingFrictionForce) + factorKineticPart * (gravityForceAlongBar + kineticFrictionForce);
             } else {
                 accelerationForce = 0;
-            }
-            if (config.withLogging == true) {
-                console.log("accelerationForce (gleiten) = " + accelerationForce)
             }
         }
 
@@ -129,10 +103,7 @@ function applyPhysicsStep(dt) {
     } else if (angle < 0) {
         effectiveStart -= Math.abs(sinAngle) * gameState.ball.radius*1.5;
     }
-    if (config.withLogging == true) {
-        console.log("startX, effectiveStart = " + startX + ", " + effectiveStart);
-        console.log("endX, effectiveEnd = " + endX + ", " + effectiveEnd);
-    }
+
     if (gameState.ball.x - gameState.ball.radius < effectiveStart) {
         gameState.ball.x = effectiveStart + gameState.ball.radius;
         gameState.ball.speedX = -gameState.ball.speedX * (1 - config.physics.wallBounceDamping);
@@ -147,8 +118,10 @@ function applyPhysicsStep(dt) {
         const dx = gameState.ball.x - hole.actualX;
         const dy = gameState.ball.y - hole.actualY;
         const distance = Math.sqrt(dx * dx + dy * dy);
+
         const holeTypeNum = parseInt(hole.Type, 10);
-        let holeOverlapThreshold = 1;
+        let holeOverlapThreshold;
+
         if (holeTypeNum === gameState.currentTarget) {
             if (Math.abs(gameState.ball.speedX) > config.holes.holeOverlapThresholdTargetMaxVelocity) {
                 holeOverlapThreshold = config.holes.holeOverlapThresholdTargetMax;
@@ -156,13 +129,25 @@ function applyPhysicsStep(dt) {
                 const delta = (config.holes.holeOverlapThresholdTargetMin - config.holes.holeOverlapThresholdTargetMax) / config.holes.holeOverlapThresholdTargetMaxVelocity;
                 holeOverlapThreshold = config.holes.holeOverlapThresholdTargetMin - delta * Math.abs(gameState.ball.speedX);
             }
-            console.log("gameState.ball.speedX = " + gameState.ball.speedX);
-            console.log("holeOverlapThreshold = " + holeOverlapThreshold);
         } else {
             holeOverlapThreshold = config.holes.holeOverlapThresholdMiss;
         }
 
-        if (distance + gameState.ball.radius * holeOverlapThreshold <= hole.actualRadius) {
+        let currentHoleRadius = hole.actualRadius;
+
+        // Wenn expert Modus und aktuelles Zielloch: Effektiven Radius anpassen
+        if (gameState.mode !== 'beginner' && holeTypeNum === gameState.currentTarget) {
+            const s = gameState.shutter;
+
+            if (s.state === 'closing' || s.state === 'opening') {
+                currentHoleRadius = hole.actualRadius * (1 - s.progress);
+            } else if (s.state === 'closed') {
+                currentHoleRadius = 0;
+            }
+        }
+
+        // Kollisionsprüfung mit aktuellem effektiven Radius
+        if (distance + gameState.ball.radius * holeOverlapThreshold <= currentHoleRadius) {
             handleHoleCollision(hole);
             return;
         }
@@ -196,14 +181,16 @@ function handleCorrectHole() {
     ];
 
     const timeForLevel = gameState.elapsedTime - gameState.timeLastHole;
+    const livesForLevel = gameState.livesLastHole - gameState.lives;
     gameState.level_info.push({
         'level': gameState.currentTarget,
         'time': timeForLevel,
-        'lives': gameState.lives,
+        'lives': livesForLevel,
         'date': Timestamp.now(),
     });
 
     gameState.timeLastHole = gameState.elapsedTime;
+    gameState.livesLastHole = gameState.lives;
 
     const message = messages[Math.floor(Math.random() * messages.length)];
     showTemporaryMessage(message, 1000, () => {

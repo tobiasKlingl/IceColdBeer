@@ -42,12 +42,41 @@ function changeGameMode(direction) {
 
 const highScoreList = document.getElementById('highScoreList');
 
+let direction = null;
 let touchStartX = 0;
+let touchStartY = 0;
 let touchEndX = 0;
 
 highScoreList.addEventListener('touchstart', (e) => {
+    direction = null;
     touchStartX = e.changedTouches[0].screenX;
+    touchStartY = e.changedTouches[0].screenY;
 }, false);
+
+highScoreList.addEventListener('touchmove', (e) => {
+    const currentX = e.changedTouches[0].screenX;
+    const currentY = e.changedTouches[0].screenY;
+    const dx = currentX - touchStartX;
+    const dy = currentY - touchStartY;
+
+    if (direction === null) {
+        // Determine direction: compare absolute horizontal and vertical movement
+        if (Math.abs(dx) > Math.abs(dy)) {
+            // User is swiping horizontally
+            direction = 'horizontal';
+            // For horizontal mode changing, prevent default scrolling
+            e.preventDefault();
+        } else {
+            // User is scrolling vertically
+            direction = 'vertical';
+            // Do not preventDefault() here, allow vertical scroll
+        }
+    } else if (direction === 'horizontal') {
+        // If already decided horizontal, keep preventing default
+        e.preventDefault();
+    }
+    // If vertical was chosen, do nothing special and allow scroll
+}, { passive: false });
 
 highScoreList.addEventListener('touchend', (e) => {
     touchEndX = e.changedTouches[0].screenX;
@@ -171,7 +200,6 @@ export async function showEndScreen(won, directAccess = false) {
                     const messages = [];
                     const playerRank = getPlayerRank(highScores, score);
                     const inTopTen = playerRank <= 10;
-                    const inTopHundred = playerRank <= 100;
 
                     if (!querySnapshotName.empty) {
                         const existingDoc = querySnapshotName.docs[0];
@@ -188,7 +216,8 @@ export async function showEndScreen(won, directAccess = false) {
                             if (existingLevelInfoIndex !== -1) {
                                 const existingInfo = existingScore.level_info[existingLevelInfoIndex];
                                 const existingTime = existingInfo.time;
-                                if (info.time < existingTime) {
+                                const existingLives = existingInfo.lives;
+                                if (info.time < existingTime || (info.time === existingTime && info.lives < existingLives)) {
                                     existingScore.level_info[existingLevelInfoIndex].time = info.time;
                                     existingScore.level_info[existingLevelInfoIndex].lives = info.lives;
                                     existingScore.level_info[existingLevelInfoIndex].date = info.date;
@@ -393,16 +422,13 @@ function displayHighScores(highScores, tab = 'overall') {
         highScoresTableBody.appendChild(tr);
     });
 
-    // Scrollen zur hervorgehobenen Zeile, wenn sie nicht in den Top 10 ist
     const highlightCell = highScoresTableBody.querySelector('.highlight');
     if (highlightCell) {
         const tr = highlightCell.parentElement;
-        const tableBody = highScoresTableBody.parentElement; // Annahme: tbody ist direkt unter #highScoreTable
         const rowTop = tr.offsetTop;
         const rowHeight = tr.offsetHeight;
         const tableHeight = highScoresTableBody.clientHeight;
-    
-        // Berechne die neue ScrollTop-Position
+
         const newScrollTop = rowTop - (tableHeight / 2) + (rowHeight / 2);
         highScoresTableBody.scrollTop = newScrollTop;
     }

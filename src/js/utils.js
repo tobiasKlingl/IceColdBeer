@@ -31,19 +31,15 @@ export function isWithinTopN(highScores, score, topN) {
 }
 
 export function getPlayerRank(highScores, playerScore) {
-    // Erstelle eine Kopie des highScores-Arrays und füge den neuen Score hinzu
     const updatedScores = [...highScores, playerScore];
-    // Sortiere das aktualisierte Array
     updatedScores.sort(compareScoresOverall);
-    // Finde den Index des neuen Scores
     const rank = updatedScores.findIndex(score =>
         score.name === playerScore.name &&
         score.level === playerScore.level &&
         score.time === playerScore.time &&
         score.lives === playerScore.lives &&
-        score.date.seconds === playerScore.date.seconds // Annahme: date ist ein Timestamp
+        score.date.seconds === playerScore.date.seconds
     );
-    // Position ist der Index + 1
     return rank + 1;
 }
 
@@ -86,8 +82,8 @@ function compareScoresForLevel(level) {
         const levelInfoB = b.level_info.find(info => info.level === level);
         if (levelInfoA.time !== levelInfoB.time) {
             return levelInfoA.time - levelInfoB.time;
-        } else if (levelInfoB.lives !== levelInfoA.lives) {
-            return levelInfoB.lives - levelInfoA.lives;
+        } else if (levelInfoA.lives !== levelInfoB.lives) {
+            return levelInfoA.lives - levelInfoB.lives;
         } else {
             const dateA = levelInfoA.date.toDate().getTime();
             const dateB = levelInfoB.date.toDate().getTime();

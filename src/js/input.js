@@ -141,7 +141,7 @@ export function updateBars(deltaTime) {
     gameState.bar.leftY += gameState.bar.leftYSpeed * deltaTime;
     gameState.bar.rightY += gameState.bar.rightYSpeed * deltaTime;
 
-    const minY = gameState.ball.radius + gameState.bar.height / 2;
+    const minY = 2*gameState.ball.radius + gameState.bar.height / 2;
     if (gameState.bar.leftY < minY) gameState.bar.leftY = minY;
     if (gameState.bar.rightY < minY) gameState.bar.rightY = minY;
 }

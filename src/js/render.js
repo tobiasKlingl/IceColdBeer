@@ -29,16 +29,13 @@ export function draw(deltaTime) {
             holeColor = config.display.colors.missHoleColor;
         }
 
-        // Loch
         gameState.ctx.beginPath();
         gameState.ctx.arc(hole.actualX, hole.actualY, hole.actualRadius, 0, Math.PI * 2);
         gameState.ctx.fillStyle = holeColor;
         gameState.ctx.fill();
         gameState.ctx.closePath();
 
-        // Zahlen auf dem Loch
         if ((holeTypeNum >= 1 && holeTypeNum <= config.gameplay.totalLevels) || (config.holes.showNumbersOnMissHoles === true )) {
-            // Lochrand als offener Kreis
             const borderColor = (holeTypeNum === gameState.currentTarget) ? config.holes.currentHoleBorderColor : config.holes.otherHoleBorderColor;
             const holeBorderWidth = (holeTypeNum === gameState.currentTarget) ? config.holes.currentHoleBorderWidth : config.holes.otherHoleBorderWidth;
             const holeMargin = config.holes.holeBorderMargin;
@@ -55,7 +52,7 @@ export function draw(deltaTime) {
 
             gameState.ctx.fillStyle = config.display.fontColor;
             const fontSize = gameState.canvas.height * config.display.fontSizePercentage / (window.devicePixelRatio || 1);
-            let holeNumberFontWeight = (holeTypeNum === gameState.currentTarget) ? 'normal ' : 'normal ';
+            let holeNumberFontWeight = 'normal ';
             gameState.ctx.font = holeNumberFontWeight + fontSize + 'px ' + config.display.fontFamily;
             gameState.ctx.textAlign = 'center';
             gameState.ctx.textBaseline = 'middle';
@@ -64,6 +61,10 @@ export function draw(deltaTime) {
                 hole.actualX,
                 hole.actualY - hole.actualRadius - 4 * holeBorderWidth
             );
+        }
+
+        if (gameState.mode !== 'beginner' && holeTypeNum === gameState.currentTarget) {
+            drawShutters(hole);
         }
     });
 
@@ -75,7 +76,6 @@ export function draw(deltaTime) {
     const startY = gameState.bar.leftY + barSlope * startX;
     const endY = gameState.bar.leftY + barSlope * endX;
 
-    // Stange
     gameState.ctx.beginPath();
     gameState.ctx.moveTo(startX, startY);
     gameState.ctx.lineTo(endX, endY);
@@ -84,14 +84,12 @@ export function draw(deltaTime) {
     gameState.ctx.stroke();
     gameState.ctx.closePath();
 
-    // Ball
     gameState.ctx.beginPath();
     gameState.ctx.arc(gameState.ball.x, gameState.ball.y, gameState.ball.radius, 0, Math.PI * 2);
     gameState.ctx.fillStyle = gameState.ball.color;
     gameState.ctx.fill();
     gameState.ctx.closePath();
 
-    // Constraints
     const dx = endX - startX;
     const dy = endY - startY;
     const length = Math.sqrt(dx * dx + dy * dy);
@@ -136,6 +134,46 @@ export function draw(deltaTime) {
     gameState.ctx.stroke();
     gameState.ctx.closePath();
 
-    // Physik anwenden
     applyPhysics(deltaTime);
+}
+
+function drawShutters(hole) {
+    const s = gameState.shutter;
+    const h = config.holes;
+
+    const x = hole.actualX;
+    const y = hole.actualY;
+    const r = hole.actualRadius;
+
+    const ctx = gameState.ctx;
+
+    if (s.state === 'warning') {
+        // Verwende nun shutterWarningBorderWidth aus config
+        ctx.beginPath();
+        ctx.arc(x, y, r * 1.05, 0, 2*Math.PI);
+        ctx.strokeStyle = h.shutterWarningColor;
+        ctx.lineWidth = h.shutterWarningBorderWidth;
+        ctx.stroke();
+        ctx.closePath();
+    } else if (s.state === 'closing' || s.state === 'opening') {
+        const progress = s.progress;
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, 2*Math.PI);
+        ctx.clip();
+
+        ctx.fillStyle = h.shutterColor;
+
+        const halfWidth = r * progress;
+        ctx.fillRect(x - r - 1, y - r, halfWidth, 2*r);
+        ctx.fillRect(x + r - halfWidth, y - r, halfWidth+1, 2*r);
+
+        ctx.restore();
+    } else if (s.state === 'closed') {
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, 2*Math.PI);
+        ctx.fillStyle = h.shutterColor;
+        ctx.fill();
+        ctx.closePath();
+    }
 }

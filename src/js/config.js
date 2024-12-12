@@ -28,9 +28,9 @@ export const config = {
         gravity: 9.81,
         ballMass: 0.016,
         staticFrictionCoefficient: 0.1,
-        kineticFrictionCoefficient: 0.06,
+        kineticFrictionCoefficient: 0.05,
         rollingFrictionCoefficient: 0.01,
-        wallBounceDamping: 0.66,
+        wallBounceDamping: 0.70,
         maxGameDuration: 60 * 60 * 1000,
         timerUpdateInterval: 10,
         subSteps: 4,
@@ -45,23 +45,21 @@ export const config = {
     bar: {
         height: 5,
         color: 'rgba(255, 165, 0, 0.8)',
-        baseSpeed: 7.5,
+        baseSpeed: 10,
         speedDampingFactor: 1.0,
         startYPercentage: 0.96,
         joystickMaxMovement: 51,
-        joystickSensitivity: 8,
+        joystickSensitivity: 6,
         joystickDeadzone: 0,
         startPercentage: 0.0275,
         endPercentage: 0.975,
-        constraintHeight: 16,
+        constraintHeight: 18,
         constraintWidth: 5,
         constraintColor: 'rgba(255, 165, 0, 0.8)'
     },
 
     holes: {
-        scaleFactorHoleVelocityAdvanced: 0.5,
-        scaleFactorHoleVelocityExtrem: 1,
-        holeOverlapThresholdMiss: 0.975,
+        holeOverlapThresholdMiss: 0.95,
         holeOverlapThresholdTargetMax: 0.7,
         holeOverlapThresholdTargetMin: 0.925,
         holeOverlapThresholdTargetMaxVelocity: 200,
@@ -71,7 +69,12 @@ export const config = {
         currentHoleBorderWidth: 1,
         otherHoleBorderWidth: 1,
         currentHoleBorderColor: '#999999',
-        otherHoleBorderColor: '#999999'
+        otherHoleBorderColor: '#999999',
+
+        // Neue Einstellungen:
+        shutterColor: 'rgba(0,0,0,1)', // Jetzt schwarz statt hellbraun
+        shutterWarningColor: 'rgba(0,0,0,1)',
+        shutterWarningBorderWidth: 1, // Einstellbare Breite des Warnrandes
     },
 
     gameplay: {
@@ -90,17 +93,29 @@ export const config = {
             'advanced': {
                 title: 'Fortgeschritten',
                 highscoreSheetName: 'highscores_advanced_v2',
-                emoji: '🚀'
+                emoji: '🚀',
+                scaleFactorHoleVelocity: 0.75,
+                shutterWarningTime: 500,
+                shutterClosingTime: 1000,
+                shutterClosedDuration: 1000,
+                shutterOpeningTime: 500,
+                shutterCycleInterval: 2500
             },
             'expert': {
                 title: 'Experte',
                 highscoreSheetName: 'highscores_expert_v2',
-                emoji: '💀'
+                emoji: '💀',
+                scaleFactorHoleVelocity: 1.25,
+                shutterWarningTime: 500,
+                shutterClosingTime: 1000,
+                shutterClosedDuration: 1500,
+                shutterOpeningTime: 500,
+                shutterCycleInterval: 1500
             },
         }
     },
 
-    realGameWidthInMeters: 0.47,
+    realGameWidthInMeters: 0.6,
 
     canvasWidthInLogicalPixels: null,
     canvasHeightInLogicalPixels: null,

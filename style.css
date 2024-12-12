@@ -231,7 +231,6 @@ header h1 {
     justify-content: space-between;
     align-items: center;
     padding: 5px;
-    /*margin-bottom: var(--controls-bottom-margin);*/
     background-color: var(--header-background-color);
 }
 
@@ -289,7 +288,6 @@ header h1 {
     border: none;
     border-radius: 50%;
     cursor: pointer;
-    /*padding: 20px;*/
     font-size: 6vh;
     transition: background-color 0.3s ease;
     display: flex;
@@ -310,7 +308,6 @@ header h1 {
     border-radius: 10px;
     font-size: 2.5vh;
     text-align: center;
-    z-index: 1001;
     max-width: 80%;
     word-wrap: break-word;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
@@ -318,7 +315,6 @@ header h1 {
     box-sizing: border-box; /* Sicherstellen, dass Padding korrekt berechnet wird */
     pointer-events: none; /* Overlay blockiert keine Klicks */
 }
-
 
 /* Highscore-Seite spezifische Anpassungen */
 #highScoreList {
@@ -390,11 +386,11 @@ header h1 {
 /* Highscore-Tabs */
 .highscore-tabs {
     width: 100%;
-    display: flex; /* Korrigiert von 'center' zu 'flex' */
-    justify-content: center; /* Zentriert die Tabs horizontal */
-    flex-wrap: wrap; /* Ermöglicht Zeilenumbruch bei Bedarf */
-    gap: 4px; /* Optional: Abstand zwischen den Tabs */
-    margin-bottom: 8px; /* Angepasster Abstand */
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 8px;
 }
 
 .highscore-tab {
@@ -404,7 +400,7 @@ header h1 {
     background-color: rgba(0, 128, 255, 0.8); /* Standardfarbe */
     border-color: rgba(250, 250, 250, 0.5);
     color: white;
-    border-radius: 4px; /* Leicht abgerundete Ecken */
+    border-radius: 4px;
     cursor: pointer;
     font-size: 1.75vh;
     transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
@@ -415,11 +411,11 @@ header h1 {
 }
 
 .highscore-tab.active {
-    background-color: rgba(0, 60, 150, 1); /* Tiefdunkles Blau für den aktiven Zustand */
-    color: #FFD700; /* Goldene Schriftfarbe für Kontrast */
-    transform: scale(1.15); /* Leichte Vergrößerung */
-    box-shadow: 0 0 15px rgba(0, 60, 150, 0.8); /* Leuchtender Schatten */
-    border: 1px solid #FFD700; /* Goldener Rand */
+    background-color: rgba(0, 60, 150, 1);
+    color: #FFD700;
+    transform: scale(1.15);
+    box-shadow: 0 0 15px rgba(0, 60, 150, 0.8);
+    border: 1px solid #FFD700;
 }
 
 #highScoreTable {
@@ -432,7 +428,7 @@ header h1 {
     background-color: transparent;;
     box-shadow: none;
     color: #fff;
-    overflow-x: auto; /* Ermöglicht horizontales Scrollen bei Bedarf */
+    overflow-x: auto;
 }
 
 /* Tabellenkörper scrollbar machen */
@@ -442,11 +438,10 @@ header h1 {
     border-bottom: 2px solid rgba(100, 100, 100, 1);
 }
 
-/* Sicherstellen, dass jede Zeile korrekt dargestellt wird */
 #highScoreTable thead tr, #highScoreTable tbody tr {
     width: 100%;
     display: table;
-    table-layout: fixed; /* Feste Tabellenlayout */
+    table-layout: fixed;
 }
 
 /* Tabellenkopf */
@@ -454,10 +449,9 @@ header h1 {
     position: sticky;
     font-weight: bold;
     font-size: 1em;
-    top: 0; /* Positionierung direkt am oberen Rand des Containers */
+    top: 0;
     background-color: rgba(255, 255, 255, 0);
-    color: #FFD700; /* Goldene Schriftfarbe für Kontrast */
-    z-index: 1;
+    color: #FFD700;
     box-sizing: border-box;
     padding: 5px;
 }
@@ -465,9 +459,9 @@ header h1 {
 /* Tabellenkörper scrollbar machen */
 #highScoreTable tbody {
     width: 100%;
-    max-height: 36vh; /* Maximale Höhe auf 50% der Viewport-Höhe beschränken */
+    max-height: 36vh;
     overflow-y: auto;
-    display: block; /* Ermöglicht Scrollen */
+    display: block;
     border-top: none;
     border-bottom: 2px solid rgba(100, 100, 100, 1);
 }
@@ -479,26 +473,20 @@ header h1 {
     border-bottom: 1px solid rgba(50, 50, 50, 1);
 }
 
-/* Spezifische Hervorhebung für die Highscore-Tabelle */
 #highScoreTable tbody td.highlight {
-    color: #ffff55 !important; /* Orange-Rot für den Text */
-    font-weight: bold !important; /* Fettgedruckter Text */
+    color: #ffff55 !important;
+    font-weight: bold !important;
 }
 
-/* Spezifische Breiten für jede Spalte festlegen */
+/* Spaltenbreiten */
 #highScoreTable th:nth-child(1), #highScoreTable tbody td:nth-child(1) { width: 10%; }
-
 #highScoreTable th:nth-child(2), #highScoreTable tbody td:nth-child(2) { width: 19%; }
-
 #highScoreTable th:nth-child(3), #highScoreTable tbody td:nth-child(3) { width: 15%; }
-
 #highScoreTable th:nth-child(4), #highScoreTable tbody td:nth-child(4) { width: 20%; }
-
 #highScoreTable th:nth-child(5), #highScoreTable tbody td:nth-child(5) { width: 15%; }
-
 #highScoreTable th:nth-child(6), #highScoreTable tbody td:nth-child(6) { width: 21%; }
 
-/* Alternierende Hintergrundfarben für Tabellenreihen */
+/* Alternierende Hintergrundfarben */
 #highScoreTable tbody tr:nth-child(odd) {
     background-color: rgba(255, 255, 255, 0.1);
 }
@@ -508,11 +496,11 @@ header h1 {
 }
 
 #highScoreTable tbody tr:last-child td {
-    border-bottom: none; /* Remove the line for the last row */
+    border-bottom: none;
 }
 
 #highScoreTable tr:hover {
-    background-color: rgba(255, 255, 255, 0.2); /* Highlight-Effekt beim Hover */
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 .version-display {
