@@ -63,7 +63,7 @@ export const config = {
         holeOverlapThresholdTargetMax: 0.7,
         holeOverlapThresholdTargetMin: 0.925,
         holeOverlapThresholdTargetMaxVelocity: 200,
-        showNumbersOnMissHoles: true,
+        showNumbersOnMissHoles: false,
         holeBorderMargin: 3,
         holeBorderGapAngle: 0.50,
         currentHoleBorderWidth: 1,
@@ -115,7 +115,7 @@ export const config = {
         }
     },
 
-    realGameWidthInMeters: 0.6,
+    realGameWidthInMeters: 0.64,
 
     canvasWidthInLogicalPixels: null,
     canvasHeightInLogicalPixels: null,
