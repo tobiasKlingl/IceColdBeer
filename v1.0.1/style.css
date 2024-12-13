@@ -1,0 +1,475 @@
+/* style.css */
+
+/* CSS-Variablen */
+:root {
+    /* Höhe des Headers */
+    --header-height: var(--config-header-height);
+    /* Transparenz des Headers */
+    --header-opacity: var(--config-header-opacity);
+    /* Transparenz allgemeiner Elemente */
+    --element-opacity: var(--config-element-opacity);
+    /* Größe der Buttons */
+    --button-size: var(--config-button-size);
+    /* Größe des Reset-Buttons */
+    --restart-button-size: var(--config-restart-button-size);
+    /* Schriftgröße der Buttons */
+    --button-font-size: var(--config-button-font-size);
+    /* Breite des Spielfeldrandes */
+    --playfield-border-width: var(--config-playfield-border-width);
+    /* Farbe des Spielfeldrandes */
+    --playfield-border-color: var(--config-playfield-border-color);
+    /* Hintergrundfarbe des Headers */
+    --header-background-color: var(--config-header-background-color);
+    /* Farbe der Buttons */
+    --button-color: var(--config-button-color);
+    /* Hover-Farbe der Buttons */
+    --button-hover-color: var(--config-button-hover-color);
+    /* Abstände für das Spielfeld */
+    --playfield-top-margin: var(--config-playfield-top-margin);
+    --playfield-bottom-margin: var(--config-playfield-bottom-margin);
+    /* Abstand unter den Steuerungselementen */
+    --controls-bottom-margin: var(--config-controls-bottom-margin);
+    /* Joystick-Größe */
+    --joystick-size: var(--config-joystick-size);
+    --joystick-handle-height: var(--config-joystick-handle-height);
+}
+
+/* Modus-Auswahlbildschirm */
+#modeSelectionScreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--header-background-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#modeSelectionScreen h1 {
+    font-size: 4vh;
+    margin-bottom: 20px;
+}
+
+#modeSelectionScreen h2 {
+    font-size: 3vh;
+    margin-bottom: 20px;
+}
+
+#modeSelectionScreen button {
+    padding: 15px 30px;
+    margin: 10px;
+    font-size: 3vh;
+    background-color: var(--button-color);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#modeSelectionScreen button:hover {
+    background-color: var(--button-hover-color);
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+    /* Hintergrundbild */
+    background-image: url('assets/retro_background.png?v=v1.0.1');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    padding-bottom: env(safe-area-inset-bottom);
+    font-weight: bold; /* Fettgedruckte Texte */
+}
+
+header {
+    background-color: var(--header-background-color);
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    height: var(--header-height);
+    line-height: var(--header-height);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 3vh;
+    color: #333;
+}
+
+#backToModeSelectionButton {
+    position: absolute;
+    left: 10px;
+    background: none;
+    border: none;
+    font-size: 4vh;
+    cursor: pointer;
+}
+
+.game-container {
+    position: relative;
+    width: 95%;
+    max-width: 480px; /* Maximale Breite für Desktop-Browser */
+    margin: var(--playfield-top-margin) auto var(--playfield-bottom-margin);
+    background-color: rgba(255, 255, 255, var(--element-opacity));
+    border-radius: 10px;
+    overflow: hidden;
+    border: var(--playfield-border-width) solid var(--playfield-border-color);
+}
+
+#gameCanvas {
+    display: block;
+    margin: 0 auto;
+}
+
+#endScreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.9);
+    color: #fff;
+    display: none;
+    flex-direction: column;
+    justify-content: flex-start; /*center; */
+    align-items: center;
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+#endMessage {
+    /*position: absolute; /* Ermöglicht die genaue Positionierung */
+    /*top: 20%; Abstand vom oberen Rand */
+    left: 50%; /* Zentrieren horizontal */
+    /*transform: translateX(-50%); /* Exakte Zentrierung */
+    color: #fff; /* Textfarbe */
+    text-align: center; /* Zentrierter Text */
+    font-size: 1.25em; /* Schriftgröße */
+}
+
+#endScreen > div, #endScreen > button {
+    margin: 10px;
+}
+
+#highScoreInput {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#highScoreHeader {
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr 1fr 1fr 2fr; /* Spalten für: #, Name, Level, Leben, Zeit, Datum */
+    gap: 10px;
+}
+
+
+#highScoreItems li {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr 1fr 1fr 2fr;
+    gap: 10px;
+    text-align: center;
+}
+
+#playerName {
+    padding: 5px;
+    font-size: 2vh;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 5px;
+    width: 80%;
+}
+
+#submitScoreButton {
+    padding: 10px 20px;
+    margin: 5px;
+    background-color: var(--button-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 2.5vh;
+    transition: background-color 0.3s ease;
+    width: 80%;
+}
+
+#restartButton {
+    padding: 11px 15px;
+    background-color: var(--button-color);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 2.5vh;
+    transition: background-color 0.3s ease;
+    width: 70%;
+}
+
+#resetHighscoresButton {
+    display: none; /* Versteckt den Button */
+}
+
+#submitScoreButton:hover, #restartButton:hover, #resetHighscoresButton:hover {
+    background-color: var(--button-hover-color);
+}
+
+.game-info, .controls {
+    background-color: var(--header-background-color);
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+}
+
+.game-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px;
+}
+
+.game-info > div {
+    display: flex;
+    align-items: center;
+    font-size: 2vh;
+    margin: 40 10px;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+}
+
+/* Steuerungselemente */
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px;
+    /*margin-bottom: var(--controls-bottom-margin);*/
+    background-color: var(--header-background-color);
+}
+
+.joystick-container {
+    position: relative;
+    width: var(--joystick-size);
+    height: calc(var(--joystick-size) * 2);
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
+    overflow: hidden;
+    touch-action: none;
+    flex-shrink: 0;
+}
+
+.joystick {
+    position: absolute;
+    bottom: calc(50% - var(--joystick-handle-height) / 2);
+    left: 0;
+    width: 100%;
+    height: var(--joystick-handle-height);
+    background-color: var(--button-color);
+    border-radius: 20px;
+    transition: bottom 0.1s ease-out;
+}
+
+.joystick-handle {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 100%;
+    background-color: var(--button-hover-color);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.joystick-icon {
+    font-size: 4vh;
+}
+
+#timer {
+    margin-bottom: 5px;
+    font-size: 2vh;
+    text-align: center;
+}
+
+.center-controls > button#gameResetButton {
+    width: var(--restart-button-size);
+    height: var(--restart-button-size);
+    background-color: var(--button-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 8vh;
+    line-height: var(--restart-button-size);
+    transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+}
+
+/* Swipe-Buttons innerhalb der swipeHint-Anzeige */
+#swipeHint {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 25px;
+    font-size: 2vh;
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 1px;
+}
+
+.swipe-button {
+    padding: 11px 15px;
+    font-size: 2.5vh;
+    cursor: pointer;
+    background-color: #444;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    transition: background-color 0.3s;
+}
+
+.swipe-button:hover {
+    background-color: #666;
+}
+
+/* Pop-up Meldungen */
+.message-overlay {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    padding: 20px 30px;
+    border-radius: 10px;
+    font-size: 2.5vh;
+    text-align: center;
+    z-index: 1001;
+    max-width: 80%;
+    word-wrap: break-word;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+#highScoreTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 2px 0;
+    font-size: 0.8em;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: transparent;;
+    box-shadow: none;
+    color: #fff;
+}
+
+#highScoreTable th, #highScoreTable td {
+    padding: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Transparenter Rand */
+}
+
+#highScoreTable th {
+    background-color: rgba(0, 0, 0, 0.5); /* Halbtransparenter Hintergrund für Header */
+    font-weight: bold;
+}
+
+#highScoreTable tr:nth-child(even) {
+    background-color: rgba(0, 0, 0, 0.3); /* Alternierender Hintergrund */
+}
+
+#highScoreTable tr:hover {
+    background-color: rgba(255, 255, 255, 0.1); /* Highlight-Effekt beim Hover */
+}
+
+.highscore-main {
+    font-size: 1.6em;
+    font-weight: bold;
+    text-align: center;
+    display: block;
+    margin: 0; /* Entfernt Margin */
+    margin-top: 30px;
+    padding: 0; /* Sicherstellen, dass es kein Padding gibt */
+    line-height: 1; /* Entfernt zusätzlichen vertikalen Abstand */
+}
+
+.highscore-mode {
+    font-size: 0.8em;
+    font-weight: bold;
+    text-align: center;
+    display: block;
+    text-transform: uppercase;
+    margin: 0; /* Entfernt jegliche Margin */
+}
+
+/* Highscore-Tabs */
+.highscore-tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin-bottom: 1px;
+    width: 100%;
+    justify-content: center;
+}
+
+.highscore-tab {
+    flex: 0 0 auto;
+    padding: 6px 10px;
+    margin: 2px 2px;
+    background-color: rgba(0, 128, 255, 0.8); /* Standardfarbe */
+    color: white;
+    border: none;
+    border-radius: 4px; /* Leicht abgerundete Ecken */
+    cursor: pointer;
+    font-size: 2vh;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.highscore-tab:hover {
+    background-color: rgba(0, 102, 204, 0.9); /* Deutlich dunkler beim Hover */
+}
+
+.highscore-tab.active {
+    background-color: rgba(0, 60, 150, 1); /* Tiefdunkles Blau für den aktiven Zustand */
+    color: #FFD700; /* Goldene Schriftfarbe für Kontrast */
+    transform: scale(1.1); /* Leichte Vergrößerung */
+    box-shadow: 0 0 15px rgba(0, 60, 150, 0.8); /* Leuchtender Schatten */
+    border: 1px solid #FFD700; /* Goldener Rand */
+}
+
+/* Optional: Scrollbar verstecken */
+.highscore-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.highscore-tabs {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+.version-display {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.7); 
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-family: Arial, sans-serif;
+}

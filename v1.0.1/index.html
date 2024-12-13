@@ -1,0 +1,148 @@
+<!-- index.html -->
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <!-- Meta-Angaben für Zeichensatz und Titel -->
+    <meta charset="UTF-8">
+    <title>Ice Cold Beer 🍺</title>
+    <!-- Responsives Design für mobile Geräte -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Einbindung der CSS-Datei -->
+    <link rel="stylesheet" href="style.css?v=v1.0.1">
+    <!-- SweetAlert2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <!-- Spielmodus-Auswahl -->
+    <div id="modeSelectionScreen">
+        <h1>Ice Cold Beer 🍺</h1>
+        <h2>Wähle den Spielmodus:</h2>
+        <button id="beginnerModeButton">Beginner 🐣</button>
+        <button id="advancedModeButton">Fortgeschritten 🚀</button>
+        <button id="expertModeButton">Experte 💀</button>
+        <button id="viewHighscoresButton">Highscores ansehen 🏆</button>
+    </div>
+
+    <!-- Kopfbereich der Seite -->
+    <header style="display: none;">
+        <h1>Ice Cold Beer 🍺</h1>
+        <!-- Zurück-Button -->
+        <button id="backToModeSelectionButton">⬅️</button>
+    </header>
+
+    <!-- Spielcontainer -->
+    <div class="game-container" style="display: none;">
+        <!-- Canvas-Element für das Spiel -->
+        <canvas id="gameCanvas"></canvas>
+    </div>
+
+    <!-- Steuerungselemente -->
+    <div class="controls" style="display: none;">
+        <!-- Linker Schaltknüppel -->
+        <div class="joystick-container" id="leftJoystickContainer">
+            <div class="joystick" id="leftJoystick">
+                <!-- Griff des Schaltknüppels -->
+                <div class="joystick-handle">
+                    <!-- Doppelpfeil-Emoji -->
+                    <span class="joystick-icon">↕️</span>
+                </div>
+            </div>
+        </div>
+        <!-- Zentrale Steuerungselemente -->
+        <div class="center-controls">
+            <!-- Timer-Anzeige -->
+            <div id="timer">Zeit: 00:00</div>
+            <!-- Spiel zurücksetzen Button -->
+            <button id="gameResetButton">🔄</button>
+        </div>
+        <!-- Rechter Schaltknüppel -->
+        <div class="joystick-container" id="rightJoystickContainer">
+            <div class="joystick" id="rightJoystick">
+                <div class="joystick-handle">
+                    <span class="joystick-icon">↕️</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Spielinformationen -->
+    <div class="game-info" style="display: none;">
+        <!-- Anzeige der Leben -->
+        <div id="lives">Leben: ❤️❤️❤️</div>
+        <!-- Anzeige des aktuellen Modus -->
+        <div id="currentMode">Modus: 😀</div>
+        <!-- Anzeige des aktuellen Ziels -->
+        <div id="currentHole">Ziel: Loch 1</div>
+    </div>
+
+    <!-- Endbildschirm -->
+    <div id="endScreen" style="display: none;">
+        <div id="endMessage"></div>
+        <!-- Highscore-Eingabe -->
+        <div id="highScoreInput" style="display: none;">
+            <label for="playerName">Name eingeben:</label>
+            <input type="text" id="playerName" maxlength="10">
+            <button id="submitScoreButton">Bestätigen</button>
+        </div>
+        <!-- Highscore-Liste -->
+        <div id="highScoreList">
+            <h2 id="highScoreTitle">
+                <span class="highscore-main">Highscore 🏆</span><br>
+                <span class="highscore-mode">Beginner 🐣</span>
+            </h2>
+
+            <!-- Neue Tab-Navigation hinzufügen -->
+            <div class="highscore-tabs">
+                <button class="highscore-tab active" data-level="overall">🏆</button>
+                <button class="highscore-tab" data-level="1">1</button>
+                <button class="highscore-tab" data-level="2">2</button>
+                <button class="highscore-tab" data-level="3">3</button>
+                <button class="highscore-tab" data-level="4">4</button>
+                <button class="highscore-tab" data-level="5">5</button>
+                <button class="highscore-tab" data-level="6">6</button>
+                <button class="highscore-tab" data-level="7">7</button>
+                <button class="highscore-tab" data-level="8">8</button>
+                <button class="highscore-tab" data-level="9">9</button>
+                <button class="highscore-tab" data-level="10">10</button>
+            </div> 
+
+
+            <table id="highScoreTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Level</th>
+                        <th>Zeit</th>
+                        <th>Leben</th>
+                        <th>Datum</th>
+                    </tr>
+                </thead>
+                <tbody id="highScoreItems">
+                    <!-- Zeilen werden hier dynamisch eingefügt -->
+                </tbody>
+            </table>
+            <!-- Swipe-Buttons in der swipeHint-Anzeige platzieren -->
+            <p id="swipeHint">
+                <button id="swipeLeftButton" class="swipe-button">⇐</button>
+                <button id="swipeRightButton" class="swipe-button">⇒</button>
+            </p>
+        </div>
+        <!-- Neues Spiel Button -->
+        <button id="restartButton">Neues Spiel 🔄</button>
+        <!-- Highscores zurücksetzen Button -->
+        <button id="resetHighscoresButton">Highscores zurücksetzen</button>
+    </div>
+
+
+    <div class="version-display" style="display: block;">Version: v1.0.1</div>
+
+    <!-- Einbindung der JavaScript-Datei -->
+    <script type="module" src="src/js/main.js?v=v1.0.1"></script>
+
+</body>
+</html>
